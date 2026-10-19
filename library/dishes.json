@@ -1,0 +1,22 @@
+{
+  "fanqie-jidan-mian": { "name": "番茄鸡蛋面", "tags": ["面", "蛋", "快"], "method": "汤面" },
+  "gongbao-jiding": { "name": "宫保鸡丁盖饭", "tags": ["川", "炒", "花生"], "method": "炒" },
+  "bocai-jisi-tangmian": { "name": "菠菜鸡丝汤面", "tags": ["面", "鸡", "汤"], "method": "汤面" },
+  "bocai-jidan-mian": { "name": "菠菜鸡蛋面", "tags": ["面", "蛋"], "method": "汤面" },
+  "qingjiao-jiding": { "name": "青椒鸡丁盖饭", "tags": ["炒", "鸡", "青椒"], "method": "炒" },
+  "mapo-doufu": { "name": "麻婆豆腐盖饭", "tags": ["川", "豆腐", "辣"], "method": "烧" },
+  "xianggu-niurou-mian": { "name": "香菇牛肉面", "tags": ["面", "牛", "汤"], "method": "汤面" },
+  "heijiao-niuliu": { "name": "黑椒牛柳盖饭", "tags": ["牛", "黑椒", "炒"], "method": "炒" },
+  "fanqie-niurou-tang": { "name": "番茄牛肉汤", "tags": ["牛", "汤", "番茄"], "method": "汤" },
+  "qingjiao-rousi": { "name": "青椒肉丝盖饭", "tags": ["炒", "猪", "青椒"], "method": "炒" },
+  "baicai-doufu-bao": { "name": "白菜豆腐煲", "tags": ["豆腐", "炖", "白菜"], "method": "炖" },
+  "dan-chaofan": { "name": "蛋炒饭", "tags": ["饭", "蛋", "快"], "method": "炒" },
+  "qincai-rousi": { "name": "芹菜肉丝盖饭", "tags": ["炒", "猪", "芹菜"], "method": "炒" },
+  "baicai-zhurou-fentiao": { "name": "白菜猪肉炖粉条", "tags": ["炖", "猪", "粉条"], "method": "炖" },
+  "niangao-tang": { "name": "年糕汤", "tags": ["汤", "年糕", "蛋"], "method": "汤" },
+  "suantai-rousi": { "name": "蒜苔肉丝盖饭", "tags": ["炒", "猪", "蒜苔"], "method": "炒" },
+  "xianggu-roupian": { "name": "香菇肉片盖饭", "tags": ["炒", "猪", "香菇"], "method": "炒" },
+  "huluobo-jidan-bing": { "name": "胡萝卜鸡蛋饼", "tags": ["饼", "蛋", "面"], "method": "煎" },
+  "yuxiang-rousi": { "name": "鱼香肉丝盖饭", "tags": ["川", "猪", "炒"], "method": "炒" },
+  "fanqie-roupian-danhua": { "name": "番茄肉片蛋花汤", "tags": ["汤", "猪", "番茄"], "method": "汤" }
+}

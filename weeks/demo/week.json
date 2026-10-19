@@ -1,0 +1,2336 @@
+{
+  "schema": "week.v0",
+  "id": "demo",
+  "title": "示例周",
+  "start": "2026-10-19",
+  "end": "2026-10-25",
+  "createdAt": "2026-10-18",
+  "targets": {
+    "kcal": 1900,
+    "carb": 230,
+    "protein": 100,
+    "fat": 60,
+    "range": {
+      "kcal": [
+        1800,
+        1950
+      ],
+      "carb": [
+        225,
+        240
+      ],
+      "protein": [
+        98,
+        108
+      ],
+      "fat": [
+        50,
+        65
+      ]
+    },
+    "byMeal": {
+      "早餐": {
+        "carb": 70,
+        "protein": 30
+      },
+      "午餐": {
+        "carb": 90,
+        "protein": 40
+      },
+      "晚餐": {
+        "carb": 70,
+        "protein": 30
+      }
+    },
+    "basis": "热量按 4/4/9 折算；大米 333 kcal/100g；挂面 358；年糕 232；鸡蛋去壳 55 g/个；盐 ≤5 g/天"
+  },
+  "days": [
+    {
+      "date": "2026-10-19",
+      "label": "周一",
+      "totals": {
+        "kcal": 1848,
+        "carb": 233.3,
+        "protein": 101.3,
+        "fat": 59.2
+      },
+      "meals": [
+        {
+          "slot": "早餐",
+          "name": "番茄鸡蛋面",
+          "items": [
+            {
+              "food": "挂面",
+              "qty": 80,
+              "unit": "g",
+              "foodId": "guamian"
+            },
+            {
+              "food": "番茄",
+              "qty": 150,
+              "unit": "g",
+              "note": "约 1 个",
+              "foodId": "fanqie"
+            },
+            {
+              "food": "鸡蛋",
+              "qty": 2,
+              "unit": "个",
+              "note": "去壳约 110 g",
+              "g": 110,
+              "foodId": "jidan"
+            },
+            {
+              "food": "上海青",
+              "qty": 100,
+              "unit": "g",
+              "foodId": "shanghai-qing"
+            },
+            {
+              "food": "食用油",
+              "qty": 5,
+              "unit": "g",
+              "foodId": "shiyongyou"
+            },
+            {
+              "food": "盐",
+              "qty": 1,
+              "unit": "g",
+              "foodId": "yan"
+            },
+            {
+              "food": "生抽",
+              "qty": 5,
+              "unit": "ml",
+              "foodId": "shengchou"
+            }
+          ],
+          "steps": [
+            "番茄顶部划十字，开水烫 30 秒去皮，切小块；上海青洗净掰开。",
+            "锅中放 5 g 油，中火下番茄炒 2 分钟，炒到出沙、变浓稠。",
+            "加 500 ml 热水烧开，下挂面煮 3 分钟，加盐 1 g、生抽 5 ml。",
+            "转小火，把 2 个鸡蛋磕进汤里（别搅），煮 3 分钟；最后放上海青烫 30 秒，关火。"
+          ],
+          "tip": "鸡蛋最后 3 分钟再打，蛋黄才溏心；番茄一定先炒出沙，汤才浓。",
+          "kcal": 535,
+          "macros": {
+            "kcal": 535,
+            "carb": 72.5,
+            "protein": 26.3,
+            "fat": 16.2
+          },
+          "proteinPortion": "鸡蛋 2 个（去壳约 110 g）",
+          "dishId": "fanqie-jidan-mian",
+          "image": "dish/fanqie-jidan-mian.webp",
+          "method": "汤面"
+        },
+        {
+          "slot": "午餐",
+          "name": "宫保鸡丁盖饭",
+          "items": [
+            {
+              "food": "鸡胸",
+              "qty": 160,
+              "unit": "g",
+              "foodId": "jixiong"
+            },
+            {
+              "food": "米饭（生米）",
+              "qty": 105,
+              "unit": "g",
+              "foodId": "dami"
+            },
+            {
+              "food": "花生米",
+              "qty": 15,
+              "unit": "g",
+              "foodId": "huashengmi"
+            },
+            {
+              "food": "黄瓜",
+              "qty": 80,
+              "unit": "g",
+              "foodId": "huanggua"
+            },
+            {
+              "food": "胡萝卜",
+              "qty": 30,
+              "unit": "g",
+              "foodId": "huluobo"
+            },
+            {
+              "food": "食用油",
+              "qty": 8,
+              "unit": "g",
+              "foodId": "shiyongyou"
+            },
+            {
+              "food": "干辣椒",
+              "qty": 2,
+              "unit": "个",
+              "foodId": "ganlajiao"
+            },
+            {
+              "food": "花椒",
+              "qty": 1,
+              "unit": "g",
+              "foodId": "huajiao"
+            },
+            {
+              "food": "生抽",
+              "qty": 8,
+              "unit": "ml",
+              "foodId": "shengchou"
+            },
+            {
+              "food": "醋",
+              "qty": 5,
+              "unit": "ml",
+              "foodId": "cu"
+            },
+            {
+              "food": "糖",
+              "qty": 3,
+              "unit": "g",
+              "foodId": "tang"
+            },
+            {
+              "food": "淀粉",
+              "qty": 3,
+              "unit": "g",
+              "foodId": "dianfen"
+            },
+            {
+              "food": "料酒",
+              "qty": 5,
+              "unit": "ml",
+              "foodId": "liaojiu"
+            }
+          ],
+          "steps": [
+            "生米 105 g 淘洗，放电饭煲预约，中午回家饭刚好。",
+            "鸡胸切 1.5 cm 见方的丁，加料酒 5 ml、生抽 3 ml、淀粉 3 g 抓匀，腌 10 分钟。",
+            "黄瓜、胡萝卜切同样大小的丁。小碗调汁：生抽 5 ml、醋 5 ml、糖 3 g、淀粉 2 g、清水 30 ml，搅匀。",
+            "锅烧到微微冒烟，下 8 g 油，小火放干辣椒、花椒炸 20 秒出香味。",
+            "转大火下鸡丁，摊开炒 2 分钟到表面变白，下胡萝卜丁炒 1 分钟。",
+            "下黄瓜丁翻两下，倒入调好的碗汁，大火收汁到裹住鸡丁，关火撒花生米，浇在米饭上。"
+          ],
+          "tip": "腌好的鸡丁下锅前把多余的汁滗掉，锅够热再下，才不粘锅、不出水。",
+          "kcal": 744,
+          "macros": {
+            "kcal": 744,
+            "carb": 90.1,
+            "protein": 40.8,
+            "fat": 24.3
+          },
+          "proteinPortion": "鸡胸 160 g",
+          "dishId": "gongbao-jiding",
+          "image": "dish/gongbao-jiding.webp",
+          "method": "炒"
+        },
+        {
+          "slot": "晚餐",
+          "name": "菠菜鸡丝汤面",
+          "items": [
+            {
+              "food": "挂面",
+              "qty": 75,
+              "unit": "g",
+              "foodId": "guamian"
+            },
+            {
+              "food": "鸡胸",
+              "qty": 100,
+              "unit": "g",
+              "foodId": "jixiong"
+            },
+            {
+              "food": "菠菜",
+              "qty": 250,
+              "unit": "g",
+              "foodId": "bocai"
+            },
+            {
+              "food": "食用油",
+              "qty": 9,
+              "unit": "g",
+              "foodId": "shiyongyou"
+            },
+            {
+              "food": "香油",
+              "qty": 3,
+              "unit": "g",
+              "foodId": "xiangyou"
+            },
+            {
+              "food": "盐",
+              "qty": 0.5,
+              "unit": "g",
+              "foodId": "yan"
+            },
+            {
+              "food": "生抽",
+              "qty": 5,
+              "unit": "ml",
+              "foodId": "shengchou"
+            },
+            {
+              "food": "淀粉",
+              "qty": 2,
+              "unit": "g",
+              "foodId": "dianfen"
+            }
+          ],
+          "steps": [
+            "鸡胸逆纹切细丝，加一小撮盐、2 g 淀粉抓匀；菠菜洗净切 5 cm 段。",
+            "烧一锅水，菠菜下锅焯 20 秒捞出（去草酸，汤不涩）。",
+            "锅烧热放 9 g 油，下鸡丝快速滑散，变白后加 600 ml 热水烧开。",
+            "下挂面煮 3 分钟，加盐 0.5 g、生抽 5 ml，放回菠菜，淋香油 3 g 出锅。"
+          ],
+          "tip": "菠菜先焯水再回锅，既去涩又不会把汤染黑；鸡丝逆纹切、提前抓淀粉，久煮也不柴。",
+          "kcal": 569,
+          "macros": {
+            "kcal": 569,
+            "carb": 70.7,
+            "protein": 34.2,
+            "fat": 18.7
+          },
+          "proteinPortion": "鸡胸 100 g",
+          "dishId": "bocai-jisi-tangmian",
+          "image": "dish/bocai-jisi-tangmian.webp",
+          "method": "汤面"
+        }
+      ],
+      "tonightNotes": [],
+      "notes": []
+    },
+    {
+      "date": "2026-10-20",
+      "label": "周二",
+      "totals": {
+        "kcal": 1845,
+        "carb": 232.2,
+        "protein": 102.3,
+        "fat": 58.9
+      },
+      "meals": [
+        {
+          "slot": "早餐",
+          "name": "菠菜鸡蛋面",
+          "items": [
+            {
+              "food": "挂面",
+              "qty": 80,
+              "unit": "g",
+              "foodId": "guamian"
+            },
+            {
+              "food": "菠菜",
+              "qty": 100,
+              "unit": "g",
+              "foodId": "bocai"
+            },
+            {
+              "food": "鸡蛋",
+              "qty": 2,
+              "unit": "个",
+              "note": "去壳约 110 g",
+              "g": 110,
+              "foodId": "jidan"
+            },
+            {
+              "food": "食用油",
+              "qty": 5,
+              "unit": "g",
+              "foodId": "shiyongyou"
+            },
+            {
+              "food": "盐",
+              "qty": 0.5,
+              "unit": "g",
+              "foodId": "yan"
+            },
+            {
+              "food": "生抽",
+              "qty": 3,
+              "unit": "ml",
+              "foodId": "shengchou"
+            }
+          ],
+          "steps": [
+            "菠菜洗净切 5 cm 段；烧 600 ml 水，水开下菠菜焯 20 秒捞出。",
+            "同一锅水下挂面煮 3 分钟。",
+            "转小火，把 2 个鸡蛋磕进汤里（别搅），煮 3 分钟。",
+            "加盐 0.5 g、生抽 3 ml，放回菠菜，关火。"
+          ],
+          "tip": "菠菜先焯后回锅，汤不涩；鸡蛋最后 3 分钟打，蛋黄才溏心。",
+          "kcal": 514,
+          "macros": {
+            "kcal": 514,
+            "carb": 68.3,
+            "protein": 26.0,
+            "fat": 15.9
+          },
+          "proteinPortion": "鸡蛋 2 个（去壳约 110 g）",
+          "dishId": "bocai-jidan-mian",
+          "image": "dish/bocai-jidan-mian.webp",
+          "method": "汤面"
+        },
+        {
+          "slot": "午餐",
+          "name": "青椒鸡丁盖饭",
+          "items": [
+            {
+              "food": "鸡胸",
+              "qty": 160,
+              "unit": "g",
+              "foodId": "jixiong"
+            },
+            {
+              "food": "米饭（生米）",
+              "qty": 105,
+              "unit": "g",
+              "foodId": "dami"
+            },
+            {
+              "food": "青椒",
+              "qty": 150,
+              "unit": "g",
+              "note": "约 2 个",
+              "foodId": "qingjiao"
+            },
+            {
+              "food": "上海青",
+              "qty": 100,
+              "unit": "g",
+              "foodId": "shanghai-qing"
+            },
+            {
+              "food": "食用油",
+              "qty": 8,
+              "unit": "g",
+              "foodId": "shiyongyou"
+            },
+            {
+              "food": "生抽",
+              "qty": 8,
+              "unit": "ml",
+              "foodId": "shengchou"
+            },
+            {
+              "food": "料酒",
+              "qty": 5,
+              "unit": "ml",
+              "foodId": "liaojiu"
+            },
+            {
+              "food": "淀粉",
+              "qty": 3,
+              "unit": "g",
+              "foodId": "dianfen"
+            },
+            {
+              "food": "蒜",
+              "qty": 2,
+              "unit": "瓣",
+              "foodId": "suan"
+            }
+          ],
+          "steps": [
+            "生米 105 g 淘洗，放电饭煲预约。",
+            "鸡胸切 1.5 cm 丁，加料酒 5 ml、生抽 3 ml、淀粉 3 g 抓匀，腌 10 分钟。",
+            "青椒去籽切丁，蒜切片，上海青洗净掰开。",
+            "锅烧到微微冒烟，下 8 g 油，大火下鸡丁摊开炒 2 分钟到变白。",
+            "下蒜片、青椒丁，大火炒 1 分钟，再下上海青炒 30 秒到叶子塌软。",
+            "加生抽 5 ml 和 2 汤匙水，翻匀收汁，连菜带汁浇在米饭上。"
+          ],
+          "tip": "上海青最后下、炒到刚塌软就收汁，久炒会出水；青椒只炒 1 分钟，脆才好吃。",
+          "kcal": 681,
+          "macros": {
+            "kcal": 681,
+            "carb": 93.6,
+            "protein": 39.3,
+            "fat": 18.1
+          },
+          "proteinPortion": "鸡胸 160 g",
+          "dishId": "qingjiao-jiding",
+          "image": "dish/qingjiao-jiding.webp",
+          "method": "炒"
+        },
+        {
+          "slot": "晚餐",
+          "name": "麻婆豆腐盖饭",
+          "items": [
+            {
+              "food": "卤水豆腐",
+              "qty": 200,
+              "unit": "g",
+              "foodId": "lvshui-doufu"
+            },
+            {
+              "food": "鸡胸",
+              "qty": 40,
+              "unit": "g",
+              "foodId": "jixiong"
+            },
+            {
+              "food": "米饭（生米）",
+              "qty": 85,
+              "unit": "g",
+              "foodId": "dami"
+            },
+            {
+              "food": "青蒜",
+              "qty": 30,
+              "unit": "g",
+              "foodId": "qingsuan"
+            },
+            {
+              "food": "食用油",
+              "qty": 12,
+              "unit": "g",
+              "foodId": "shiyongyou"
+            },
+            {
+              "food": "郫县豆瓣酱",
+              "qty": 10,
+              "unit": "g",
+              "foodId": "doubanjiang"
+            },
+            {
+              "food": "生抽",
+              "qty": 3,
+              "unit": "ml",
+              "foodId": "shengchou"
+            },
+            {
+              "food": "花椒粉",
+              "qty": 0.5,
+              "unit": "g",
+              "foodId": "huajiaofen"
+            },
+            {
+              "food": "干辣椒",
+              "qty": 2,
+              "unit": "个",
+              "foodId": "ganlajiao"
+            },
+            {
+              "food": "淀粉",
+              "qty": 5,
+              "unit": "g",
+              "foodId": "dianfen"
+            }
+          ],
+          "steps": [
+            "豆腐切 2 cm 方块，放淡盐水里泡 5 分钟（去豆腥、煮时不易碎）；鸡胸剁成末；青蒜切段。",
+            "锅放 12 g 油，中火下鸡末炒散，加豆瓣酱 10 g、干辣椒 2 个，小火炒 1 分钟出红油。",
+            "加 200 ml 热水烧开，下豆腐，用铲背轻推，小火煮 3 分钟。",
+            "加生抽 3 ml、花椒粉 0.5 g；淀粉 5 g 加水调匀，分两次淋入，轻推至汤汁挂勺。",
+            "撒青蒜段，连汁浇在米饭上。"
+          ],
+          "tip": "豆腐下锅后别用铲子翻炒，晃锅就行；勾芡分两次，第二次收尾汁才亮。",
+          "kcal": 650,
+          "macros": {
+            "kcal": 650,
+            "carb": 70.3,
+            "protein": 37.0,
+            "fat": 24.9
+          },
+          "proteinPortion": "卤水豆腐 200 g + 鸡胸 40 g",
+          "dishId": "mapo-doufu",
+          "image": "dish/mapo-doufu.webp",
+          "method": "烧"
+        }
+      ],
+      "tonightNotes": [],
+      "notes": []
+    },
+    {
+      "date": "2026-10-21",
+      "label": "周三",
+      "totals": {
+        "kcal": 1832,
+        "carb": 238.2,
+        "protein": 105.5,
+        "fat": 55.2
+      },
+      "meals": [
+        {
+          "slot": "早餐",
+          "name": "香菇牛肉面",
+          "items": [
+            {
+              "food": "挂面",
+              "qty": 80,
+              "unit": "g",
+              "foodId": "guamian"
+            },
+            {
+              "food": "牛肉",
+              "qty": 60,
+              "unit": "g",
+              "foodId": "niurou"
+            },
+            {
+              "food": "香菇",
+              "qty": 100,
+              "unit": "g",
+              "foodId": "xianggu"
+            },
+            {
+              "food": "上海青",
+              "qty": 200,
+              "unit": "g",
+              "foodId": "shanghai-qing"
+            },
+            {
+              "food": "鸡蛋",
+              "qty": 1,
+              "unit": "个",
+              "note": "去壳约 55 g",
+              "g": 55,
+              "foodId": "jidan"
+            },
+            {
+              "food": "食用油",
+              "qty": 8,
+              "unit": "g",
+              "foodId": "shiyongyou"
+            },
+            {
+              "food": "生抽",
+              "qty": 5,
+              "unit": "ml",
+              "foodId": "shengchou"
+            },
+            {
+              "food": "料酒",
+              "qty": 3,
+              "unit": "ml",
+              "foodId": "liaojiu"
+            },
+            {
+              "food": "淀粉",
+              "qty": 2,
+              "unit": "g",
+              "foodId": "dianfen"
+            }
+          ],
+          "steps": [
+            "牛肉逆纹切薄片，加料酒 3 ml、生抽 2 ml、淀粉 2 g 抓匀，腌 10 分钟。",
+            "香菇切片，上海青洗净掰开。",
+            "锅放 8 g 油，中火下香菇炒 2 分钟到变软，加 600 ml 热水烧开。",
+            "下挂面煮 3 分钟，下牛肉片滑散，煮 1 分钟。",
+            "磕入鸡蛋煮 2 分钟，放上海青烫 30 秒，加生抽 3 ml，关火。"
+          ],
+          "tip": "牛肉片最后下、只煮 1 分钟，久了就柴；香菇先炒出香味，汤才鲜。",
+          "kcal": 557,
+          "macros": {
+            "kcal": 557,
+            "carb": 73.6,
+            "protein": 33.4,
+            "fat": 16.1
+          },
+          "proteinPortion": "牛肉 60 g + 鸡蛋 1 个",
+          "dishId": "xianggu-niurou-mian",
+          "image": "dish/xianggu-niurou-mian.webp",
+          "method": "汤面"
+        },
+        {
+          "slot": "午餐",
+          "name": "黑椒牛柳盖饭",
+          "items": [
+            {
+              "food": "牛肉",
+              "qty": 150,
+              "unit": "g",
+              "foodId": "niurou"
+            },
+            {
+              "food": "米饭（生米）",
+              "qty": 90,
+              "unit": "g",
+              "foodId": "dami"
+            },
+            {
+              "food": "洋葱",
+              "qty": 150,
+              "unit": "g",
+              "note": "约半个",
+              "foodId": "yangcong"
+            },
+            {
+              "food": "青椒",
+              "qty": 100,
+              "unit": "g",
+              "foodId": "qingjiao"
+            },
+            {
+              "food": "食用油",
+              "qty": 14,
+              "unit": "g",
+              "foodId": "shiyongyou"
+            },
+            {
+              "food": "生抽",
+              "qty": 6,
+              "unit": "ml",
+              "foodId": "shengchou"
+            },
+            {
+              "food": "蚝油",
+              "qty": 5,
+              "unit": "g",
+              "foodId": "haoyou"
+            },
+            {
+              "food": "料酒",
+              "qty": 5,
+              "unit": "ml",
+              "foodId": "liaojiu"
+            },
+            {
+              "food": "淀粉",
+              "qty": 3,
+              "unit": "g",
+              "foodId": "dianfen"
+            },
+            {
+              "food": "黑胡椒",
+              "qty": 2,
+              "unit": "g",
+              "foodId": "heihujiao"
+            },
+            {
+              "food": "糖",
+              "qty": 2,
+              "unit": "g",
+              "foodId": "tang"
+            }
+          ],
+          "steps": [
+            "生米 90 g 淘洗，放电饭煲预约。",
+            "牛肉逆纹切 0.5 cm 粗的条，加料酒 5 ml、生抽 2 ml、淀粉 3 g、黑胡椒 1 g 抓匀，腌 10 分钟。",
+            "洋葱切丝，青椒切条。",
+            "锅烧到冒烟，下 14 g 油，大火下牛柳快速滑炒 1 分钟，变色立刻盛出。",
+            "原锅下洋葱炒 1 分钟到变软，加青椒炒 30 秒，倒回牛柳。",
+            "加生抽 4 ml、蚝油 5 g、糖 2 g、黑胡椒 1 g，大火翻匀 20 秒，浇在米饭上。"
+          ],
+          "tip": "牛柳分两次下锅、全程大火，锅不凉肉才嫩；洋葱炒到边缘透明再回肉。",
+          "kcal": 667,
+          "macros": {
+            "kcal": 667,
+            "carb": 88.2,
+            "protein": 37.5,
+            "fat": 19.2
+          },
+          "proteinPortion": "牛肉 150 g",
+          "dishId": "heijiao-niuliu",
+          "image": "dish/heijiao-niuliu.webp",
+          "method": "炒"
+        },
+        {
+          "slot": "晚餐",
+          "name": "番茄牛肉汤",
+          "items": [
+            {
+              "food": "牛肉",
+              "qty": 120,
+              "unit": "g",
+              "foodId": "niurou"
+            },
+            {
+              "food": "米饭（生米）",
+              "qty": 75,
+              "unit": "g",
+              "foodId": "dami"
+            },
+            {
+              "food": "番茄",
+              "qty": 300,
+              "unit": "g",
+              "note": "约 2 个",
+              "foodId": "fanqie"
+            },
+            {
+              "food": "菠菜",
+              "qty": 150,
+              "unit": "g",
+              "foodId": "bocai"
+            },
+            {
+              "food": "食用油",
+              "qty": 15,
+              "unit": "g",
+              "foodId": "shiyongyou"
+            },
+            {
+              "food": "盐",
+              "qty": 0.5,
+              "unit": "g",
+              "foodId": "yan"
+            },
+            {
+              "food": "生抽",
+              "qty": 5,
+              "unit": "ml",
+              "foodId": "shengchou"
+            },
+            {
+              "food": "料酒",
+              "qty": 3,
+              "unit": "ml",
+              "foodId": "liaojiu"
+            },
+            {
+              "food": "淀粉",
+              "qty": 2,
+              "unit": "g",
+              "foodId": "dianfen"
+            },
+            {
+              "food": "姜",
+              "qty": 2,
+              "unit": "片",
+              "foodId": "jiang"
+            }
+          ],
+          "steps": [
+            "牛肉逆纹切薄片，加料酒 3 ml、生抽 2 ml、淀粉 2 g 抓匀；番茄去皮切块；菠菜焯 20 秒捞出。",
+            "锅放 15 g 油，下姜片、番茄块，中火炒 3 分钟，炒到番茄完全出沙。",
+            "加 700 ml 热水烧开，下牛肉片滑散，煮 2 分钟。",
+            "加盐 0.5 g、生抽 3 ml，关火放菠菜。",
+            "盛出配米饭。"
+          ],
+          "tip": "番茄一定炒到出沙再加水，汤才红浓；牛肉片最后下，煮 2 分钟足够。",
+          "kcal": 608,
+          "macros": {
+            "kcal": 608,
+            "carb": 76.4,
+            "protein": 34.6,
+            "fat": 19.9
+          },
+          "proteinPortion": "牛肉 120 g",
+          "dishId": "fanqie-niurou-tang",
+          "image": "dish/fanqie-niurou-tang.webp",
+          "method": "汤"
+        }
+      ],
+      "tonightNotes": [],
+      "notes": []
+    },
+    {
+      "date": "2026-10-22",
+      "label": "周四",
+      "totals": {
+        "kcal": 1828,
+        "carb": 235.8,
+        "protein": 104.5,
+        "fat": 54.8
+      },
+      "meals": [
+        {
+          "slot": "早餐",
+          "name": "番茄鸡蛋面",
+          "items": [
+            {
+              "food": "挂面",
+              "qty": 80,
+              "unit": "g",
+              "foodId": "guamian"
+            },
+            {
+              "food": "番茄",
+              "qty": 150,
+              "unit": "g",
+              "note": "约 1 个",
+              "foodId": "fanqie"
+            },
+            {
+              "food": "鸡蛋",
+              "qty": 2,
+              "unit": "个",
+              "note": "去壳约 110 g",
+              "g": 110,
+              "foodId": "jidan"
+            },
+            {
+              "food": "上海青",
+              "qty": 100,
+              "unit": "g",
+              "foodId": "shanghai-qing"
+            },
+            {
+              "food": "食用油",
+              "qty": 5,
+              "unit": "g",
+              "foodId": "shiyongyou"
+            },
+            {
+              "food": "盐",
+              "qty": 0.5,
+              "unit": "g",
+              "foodId": "yan"
+            },
+            {
+              "food": "生抽",
+              "qty": 5,
+              "unit": "ml",
+              "foodId": "shengchou"
+            }
+          ],
+          "steps": [
+            "番茄划十字，开水烫 30 秒去皮切块；上海青洗净。",
+            "锅放 5 g 油，中火下番茄炒 2 分钟出沙，加 500 ml 热水烧开。",
+            "下挂面煮 3 分钟，加盐 0.5 g、生抽 5 ml。",
+            "转小火磕入 2 个鸡蛋，煮 3 分钟，放上海青烫 30 秒，关火。"
+          ],
+          "tip": "今天鸡蛋还是最后 3 分钟打；番茄多炒 1 分钟，汤更浓。",
+          "kcal": 535,
+          "macros": {
+            "kcal": 535,
+            "carb": 72.5,
+            "protein": 26.3,
+            "fat": 16.2
+          },
+          "proteinPortion": "鸡蛋 2 个（去壳约 110 g）",
+          "dishId": "fanqie-jidan-mian",
+          "image": "dish/fanqie-jidan-mian.webp",
+          "method": "汤面"
+        },
+        {
+          "slot": "午餐",
+          "name": "青椒肉丝盖饭",
+          "items": [
+            {
+              "food": "猪精瘦肉",
+              "qty": 160,
+              "unit": "g",
+              "foodId": "zhujing-shourou"
+            },
+            {
+              "food": "米饭（生米）",
+              "qty": 105,
+              "unit": "g",
+              "foodId": "dami"
+            },
+            {
+              "food": "青椒",
+              "qty": 150,
+              "unit": "g",
+              "note": "约 2 个",
+              "foodId": "qingjiao"
+            },
+            {
+              "food": "食用油",
+              "qty": 8,
+              "unit": "g",
+              "foodId": "shiyongyou"
+            },
+            {
+              "food": "生抽",
+              "qty": 8,
+              "unit": "ml",
+              "foodId": "shengchou"
+            },
+            {
+              "food": "料酒",
+              "qty": 5,
+              "unit": "ml",
+              "foodId": "liaojiu"
+            },
+            {
+              "food": "淀粉",
+              "qty": 3,
+              "unit": "g",
+              "foodId": "dianfen"
+            },
+            {
+              "food": "蒜",
+              "qty": 2,
+              "unit": "瓣",
+              "foodId": "suan"
+            }
+          ],
+          "steps": [
+            "生米 105 g 淘洗，电饭煲预约。",
+            "猪肉顺纹切 0.3 cm 细丝，加料酒 5 ml、生抽 2 ml、淀粉 3 g 抓匀，腌 10 分钟。",
+            "青椒去籽切丝，蒜切末。",
+            "锅烧到冒烟，下 8 g 油，大火下肉丝快速滑散，变白盛出。",
+            "原锅下蒜末、青椒丝炒 1 分钟，倒回肉丝，加生抽 6 ml，大火翻匀，浇在米饭上。"
+          ],
+          "tip": "肉丝顺纹切才不碎，下锅前把腌汁滗掉；青椒炒到断生就回肉，别炒软。",
+          "kcal": 683,
+          "macros": {
+            "kcal": 683,
+            "carb": 89.3,
+            "protein": 39.2,
+            "fat": 19.7
+          },
+          "proteinPortion": "猪精瘦肉 160 g",
+          "dishId": "qingjiao-rousi",
+          "image": "dish/qingjiao-rousi.webp",
+          "method": "炒"
+        },
+        {
+          "slot": "晚餐",
+          "name": "白菜豆腐煲",
+          "items": [
+            {
+              "food": "卤水豆腐",
+              "qty": 200,
+              "unit": "g",
+              "foodId": "lvshui-doufu"
+            },
+            {
+              "food": "猪精瘦肉",
+              "qty": 30,
+              "unit": "g",
+              "foodId": "zhujing-shourou"
+            },
+            {
+              "food": "大白菜",
+              "qty": 300,
+              "unit": "g",
+              "foodId": "dabaicai"
+            },
+            {
+              "food": "米饭（生米）",
+              "qty": 80,
+              "unit": "g",
+              "foodId": "dami"
+            },
+            {
+              "food": "食用油",
+              "qty": 6,
+              "unit": "g",
+              "foodId": "shiyongyou"
+            },
+            {
+              "food": "生抽",
+              "qty": 5,
+              "unit": "ml",
+              "foodId": "shengchou"
+            },
+            {
+              "food": "蚝油",
+              "qty": 5,
+              "unit": "g",
+              "foodId": "haoyou"
+            },
+            {
+              "food": "蒜",
+              "qty": 2,
+              "unit": "瓣",
+              "foodId": "suan"
+            },
+            {
+              "food": "淀粉",
+              "qty": 3,
+              "unit": "g",
+              "foodId": "dianfen"
+            }
+          ],
+          "steps": [
+            "豆腐切 1.5 cm 厚片；白菜帮切片、白菜叶撕大块；猪肉切薄片。",
+            "锅放 6 g 油，下肉片炒到变色，加蒜末、白菜帮炒 2 分钟到变软。",
+            "放豆腐片，加 300 ml 热水、生抽 5 ml、蚝油 5 g，盖盖中小火炖 5 分钟。",
+            "下白菜叶再炖 2 分钟，淋淀粉水收一下汁，连汤浇在米饭上。"
+          ],
+          "tip": "白菜帮先炒、叶子后放，口感才一致；豆腐下锅后晃锅别翻，保持完整。",
+          "kcal": 610,
+          "macros": {
+            "kcal": 610,
+            "carb": 74.1,
+            "protein": 39.0,
+            "fat": 18.9
+          },
+          "proteinPortion": "卤水豆腐 200 g + 猪精瘦肉 30 g",
+          "dishId": "baicai-doufu-bao",
+          "image": "dish/baicai-doufu-bao.webp",
+          "method": "炖"
+        }
+      ],
+      "tonightNotes": [],
+      "notes": []
+    },
+    {
+      "date": "2026-10-23",
+      "label": "周五",
+      "totals": {
+        "kcal": 1872,
+        "carb": 232.9,
+        "protein": 100.5,
+        "fat": 61.7
+      },
+      "meals": [
+        {
+          "slot": "早餐",
+          "name": "蛋炒饭",
+          "items": [
+            {
+              "food": "大米",
+              "qty": 85,
+              "unit": "g",
+              "foodId": "dami"
+            },
+            {
+              "food": "鸡蛋",
+              "qty": 3,
+              "unit": "个",
+              "note": "去壳约 165 g",
+              "g": 165,
+              "foodId": "jidan"
+            },
+            {
+              "food": "胡萝卜",
+              "qty": 50,
+              "unit": "g",
+              "foodId": "huluobo"
+            },
+            {
+              "food": "大白菜",
+              "qty": 50,
+              "unit": "g",
+              "foodId": "dabaicai"
+            },
+            {
+              "food": "食用油",
+              "qty": 6,
+              "unit": "g",
+              "foodId": "shiyongyou"
+            },
+            {
+              "food": "盐",
+              "qty": 1,
+              "unit": "g",
+              "foodId": "yan"
+            },
+            {
+              "food": "生抽",
+              "qty": 3,
+              "unit": "ml",
+              "foodId": "shengchou"
+            },
+            {
+              "food": "小葱",
+              "qty": 1,
+              "unit": "根",
+              "foodId": "xiaocong"
+            }
+          ],
+          "steps": [
+            "大米 85 g 先煮成饭，摊在盘子里晾 10 分钟（或前一晚煮好冷藏），饭粒干爽才不粘。",
+            "鸡蛋打散；胡萝卜切小丁，白菜切碎，小葱切花。",
+            "锅放 6 g 油，中火倒蛋液，炒到半凝固就盛出。",
+            "原锅下胡萝卜丁、白菜碎炒 1 分钟，倒入米饭，用铲子压散炒 2 分钟。",
+            "倒回鸡蛋，加盐 1 g、生抽 3 ml，大火炒匀，撒葱花出锅。"
+          ],
+          "tip": "炒饭用凉饭、全程中大火，饭粒才粒粒分明；鸡蛋炒半熟就盛出，回锅后才嫩。",
+          "kcal": 602,
+          "macros": {
+            "kcal": 602,
+            "carb": 74.4,
+            "protein": 27.4,
+            "fat": 21.9
+          },
+          "proteinPortion": "鸡蛋 3 个（去壳约 165 g）",
+          "dishId": "dan-chaofan",
+          "image": "dish/dan-chaofan.webp",
+          "method": "炒"
+        },
+        {
+          "slot": "午餐",
+          "name": "芹菜肉丝盖饭",
+          "items": [
+            {
+              "food": "猪精瘦肉",
+              "qty": 160,
+              "unit": "g",
+              "foodId": "zhujing-shourou"
+            },
+            {
+              "food": "米饭（生米）",
+              "qty": 105,
+              "unit": "g",
+              "foodId": "dami"
+            },
+            {
+              "food": "芹菜",
+              "qty": 200,
+              "unit": "g",
+              "foodId": "qincai"
+            },
+            {
+              "food": "食用油",
+              "qty": 8,
+              "unit": "g",
+              "foodId": "shiyongyou"
+            },
+            {
+              "food": "生抽",
+              "qty": 6,
+              "unit": "ml",
+              "foodId": "shengchou"
+            },
+            {
+              "food": "料酒",
+              "qty": 5,
+              "unit": "ml",
+              "foodId": "liaojiu"
+            },
+            {
+              "food": "淀粉",
+              "qty": 3,
+              "unit": "g",
+              "foodId": "dianfen"
+            },
+            {
+              "food": "蒜",
+              "qty": 2,
+              "unit": "瓣",
+              "foodId": "suan"
+            },
+            {
+              "food": "干辣椒",
+              "qty": 1,
+              "unit": "个",
+              "foodId": "ganlajiao"
+            }
+          ],
+          "steps": [
+            "生米 105 g 淘洗，电饭煲预约。",
+            "猪肉顺纹切细丝，加料酒 5 ml、生抽 2 ml、淀粉 3 g 抓匀，腌 10 分钟。",
+            "芹菜去筋切 4 cm 段，蒜切末。",
+            "锅烧到冒烟，下 8 g 油，大火下肉丝滑散，变白盛出。",
+            "原锅下蒜末、干辣椒、芹菜，大火炒 1 分半，倒回肉丝，加生抽 4 ml，翻匀浇饭。"
+          ],
+          "tip": "芹菜先焯 10 秒再炒更脆、也更绿；不焯就大火快炒，别盖锅盖。",
+          "kcal": 684,
+          "macros": {
+            "kcal": 684,
+            "carb": 89.0,
+            "protein": 39.3,
+            "fat": 19.6
+          },
+          "proteinPortion": "猪精瘦肉 160 g",
+          "dishId": "qincai-rousi",
+          "image": "dish/qincai-rousi.webp",
+          "method": "炒"
+        },
+        {
+          "slot": "晚餐",
+          "name": "白菜猪肉炖粉条",
+          "items": [
+            {
+              "food": "猪精瘦肉",
+              "qty": 130,
+              "unit": "g",
+              "foodId": "zhujing-shourou"
+            },
+            {
+              "food": "大白菜",
+              "qty": 300,
+              "unit": "g",
+              "foodId": "dabaicai"
+            },
+            {
+              "food": "粉丝（干）",
+              "qty": 20,
+              "unit": "g",
+              "foodId": "fensi"
+            },
+            {
+              "food": "米饭（生米）",
+              "qty": 55,
+              "unit": "g",
+              "foodId": "dami"
+            },
+            {
+              "food": "食用油",
+              "qty": 11,
+              "unit": "g",
+              "foodId": "shiyongyou"
+            },
+            {
+              "food": "生抽",
+              "qty": 8,
+              "unit": "ml",
+              "foodId": "shengchou"
+            },
+            {
+              "food": "老抽",
+              "qty": 2,
+              "unit": "ml",
+              "foodId": "laochou"
+            },
+            {
+              "food": "蒜",
+              "qty": 2,
+              "unit": "瓣",
+              "foodId": "suan"
+            },
+            {
+              "food": "十三香",
+              "qty": 1,
+              "unit": "g",
+              "foodId": "shisanxiang"
+            }
+          ],
+          "steps": [
+            "粉丝用温水泡 10 分钟，剪成两段；白菜帮切片、叶撕块；猪肉切薄片。",
+            "锅放 11 g 油，下肉片炒到变色，加蒜末、十三香炒香。",
+            "下白菜帮炒 2 分钟，加生抽 8 ml、老抽 2 ml，倒 400 ml 热水烧开。",
+            "下粉丝，盖盖中小火炖 6 分钟，再下白菜叶炖 2 分钟，汤汁收到略浓即可。"
+          ],
+          "tip": "粉丝别泡太久，泡软就下锅；白菜帮先炖、叶子后放，才不会烂成泥。",
+          "kcal": 586,
+          "macros": {
+            "kcal": 586,
+            "carb": 69.5,
+            "protein": 33.8,
+            "fat": 20.2
+          },
+          "proteinPortion": "猪精瘦肉 130 g",
+          "dishId": "baicai-zhurou-fentiao",
+          "image": "dish/baicai-zhurou-fentiao.webp",
+          "method": "炖"
+        }
+      ],
+      "tonightNotes": [],
+      "notes": []
+    },
+    {
+      "date": "2026-10-24",
+      "label": "周六",
+      "totals": {
+        "kcal": 1826,
+        "carb": 231.6,
+        "protein": 99.8,
+        "fat": 59.4
+      },
+      "meals": [
+        {
+          "slot": "早餐",
+          "name": "年糕汤",
+          "items": [
+            {
+              "food": "年糕",
+              "qty": 110,
+              "unit": "g",
+              "foodId": "niangao"
+            },
+            {
+              "food": "大白菜",
+              "qty": 100,
+              "unit": "g",
+              "foodId": "dabaicai"
+            },
+            {
+              "food": "香菇",
+              "qty": 50,
+              "unit": "g",
+              "foodId": "xianggu"
+            },
+            {
+              "food": "鸡蛋",
+              "qty": 3,
+              "unit": "个",
+              "note": "去壳约 165 g",
+              "g": 165,
+              "foodId": "jidan"
+            },
+            {
+              "food": "食用油",
+              "qty": 5,
+              "unit": "g",
+              "foodId": "shiyongyou"
+            },
+            {
+              "food": "生抽",
+              "qty": 5,
+              "unit": "ml",
+              "foodId": "shengchou"
+            },
+            {
+              "food": "盐",
+              "qty": 0.5,
+              "unit": "g",
+              "foodId": "yan"
+            },
+            {
+              "food": "小葱",
+              "qty": 1,
+              "unit": "根",
+              "foodId": "xiaocong"
+            }
+          ],
+          "steps": [
+            "年糕切 0.5 cm 片，泡冷水 5 分钟防粘；白菜切丝，香菇切片，小葱切花。",
+            "锅放 5 g 油，下香菇、白菜丝炒 1 分钟到变软。",
+            "加 600 ml 热水烧开，下年糕片煮 3 分钟，加生抽 5 ml、盐 0.5 g。",
+            "鸡蛋打散，转小火转圈淋进汤里，静置 10 秒再推散成蛋花。",
+            "撒葱花出锅。"
+          ],
+          "tip": "年糕先泡水才不粘锅；蛋液淋进去别马上搅，等 10 秒再推，蛋花才成片。",
+          "kcal": 567,
+          "macros": {
+            "kcal": 567,
+            "carb": 67.5,
+            "protein": 29.4,
+            "fat": 20.5
+          },
+          "proteinPortion": "鸡蛋 3 个（去壳约 165 g）",
+          "dishId": "niangao-tang",
+          "image": "dish/niangao-tang.webp",
+          "method": "汤"
+        },
+        {
+          "slot": "午餐",
+          "name": "蒜苔肉丝盖饭",
+          "items": [
+            {
+              "food": "猪精瘦肉",
+              "qty": 150,
+              "unit": "g",
+              "foodId": "zhujing-shourou"
+            },
+            {
+              "food": "米饭（生米）",
+              "qty": 85,
+              "unit": "g",
+              "foodId": "dami"
+            },
+            {
+              "food": "蒜苔",
+              "qty": 150,
+              "unit": "g",
+              "foodId": "suantai"
+            },
+            {
+              "food": "食用油",
+              "qty": 13,
+              "unit": "g",
+              "foodId": "shiyongyou"
+            },
+            {
+              "food": "生抽",
+              "qty": 6,
+              "unit": "ml",
+              "foodId": "shengchou"
+            },
+            {
+              "food": "料酒",
+              "qty": 5,
+              "unit": "ml",
+              "foodId": "liaojiu"
+            },
+            {
+              "food": "淀粉",
+              "qty": 3,
+              "unit": "g",
+              "foodId": "dianfen"
+            },
+            {
+              "food": "蒜",
+              "qty": 2,
+              "unit": "瓣",
+              "foodId": "suan"
+            },
+            {
+              "food": "干辣椒",
+              "qty": 1,
+              "unit": "个",
+              "foodId": "ganlajiao"
+            }
+          ],
+          "steps": [
+            "生米 85 g 淘洗，电饭煲预约。",
+            "猪肉顺纹切细丝，加料酒 5 ml、生抽 2 ml、淀粉 3 g 抓匀，腌 10 分钟。",
+            "蒜苔掐去老根切 4 cm 段，蒜切末。",
+            "锅烧到冒烟，下 13 g 油，大火下肉丝滑散，变白盛出。",
+            "原锅下蒜末、干辣椒、蒜苔，大火炒 2 分钟到蒜苔表皮起皱。",
+            "倒回肉丝，加生抽 4 ml，翻匀浇在米饭上。"
+          ],
+          "tip": "蒜苔要炒到表皮起皱才入味；肉丝先盛出，最后回锅才嫩。",
+          "kcal": 706,
+          "macros": {
+            "kcal": 706,
+            "carb": 89.1,
+            "protein": 37.7,
+            "fat": 23.6
+          },
+          "proteinPortion": "猪精瘦肉 150 g",
+          "dishId": "suantai-rousi",
+          "image": "dish/suantai-rousi.webp",
+          "method": "炒"
+        },
+        {
+          "slot": "晚餐",
+          "name": "香菇肉片盖饭",
+          "items": [
+            {
+              "food": "猪精瘦肉",
+              "qty": 120,
+              "unit": "g",
+              "foodId": "zhujing-shourou"
+            },
+            {
+              "food": "米饭（生米）",
+              "qty": 80,
+              "unit": "g",
+              "foodId": "dami"
+            },
+            {
+              "food": "香菇",
+              "qty": 150,
+              "unit": "g",
+              "foodId": "xianggu"
+            },
+            {
+              "food": "青椒",
+              "qty": 100,
+              "unit": "g",
+              "foodId": "qingjiao"
+            },
+            {
+              "food": "食用油",
+              "qty": 6,
+              "unit": "g",
+              "foodId": "shiyongyou"
+            },
+            {
+              "food": "生抽",
+              "qty": 6,
+              "unit": "ml",
+              "foodId": "shengchou"
+            },
+            {
+              "food": "蚝油",
+              "qty": 5,
+              "unit": "g",
+              "foodId": "haoyou"
+            },
+            {
+              "food": "淀粉",
+              "qty": 3,
+              "unit": "g",
+              "foodId": "dianfen"
+            },
+            {
+              "food": "蒜",
+              "qty": 2,
+              "unit": "瓣",
+              "foodId": "suan"
+            }
+          ],
+          "steps": [
+            "猪肉切薄片，加淀粉 3 g、生抽 2 ml 抓匀；香菇切片，青椒切块，蒜切片。",
+            "锅烧热放 6 g 油，下肉片炒到变色盛出。",
+            "原锅下蒜片、香菇炒 2 分钟到出香味、变软。",
+            "下青椒炒 30 秒，倒回肉片，加生抽 4 ml、蚝油 5 g，大火翻匀，浇饭。"
+          ],
+          "tip": "香菇要炒到出水再收干，香味才出来；青椒最后 30 秒下，保持脆。",
+          "kcal": 553,
+          "macros": {
+            "kcal": 553,
+            "carb": 75.0,
+            "protein": 32.7,
+            "fat": 15.2
+          },
+          "proteinPortion": "猪精瘦肉 120 g",
+          "dishId": "xianggu-roupian",
+          "image": "dish/xianggu-roupian.webp",
+          "method": "炒"
+        }
+      ],
+      "tonightNotes": [],
+      "notes": []
+    },
+    {
+      "date": "2026-10-25",
+      "label": "周日",
+      "totals": {
+        "kcal": 1882,
+        "carb": 233.6,
+        "protein": 103.8,
+        "fat": 61.5
+      },
+      "meals": [
+        {
+          "slot": "早餐",
+          "name": "胡萝卜鸡蛋饼",
+          "items": [
+            {
+              "food": "面粉（中筋）",
+              "qty": 80,
+              "unit": "g",
+              "foodId": "mianfen"
+            },
+            {
+              "food": "鸡蛋",
+              "qty": 3,
+              "unit": "个",
+              "note": "去壳约 165 g",
+              "g": 165,
+              "foodId": "jidan"
+            },
+            {
+              "food": "胡萝卜",
+              "qty": 80,
+              "unit": "g",
+              "foodId": "huluobo"
+            },
+            {
+              "food": "食用油",
+              "qty": 6,
+              "unit": "g",
+              "foodId": "shiyongyou"
+            },
+            {
+              "food": "盐",
+              "qty": 0.5,
+              "unit": "g",
+              "foodId": "yan"
+            },
+            {
+              "food": "小葱",
+              "qty": 1,
+              "unit": "根",
+              "foodId": "xiaocong"
+            },
+            {
+              "food": "清水",
+              "qty": 120,
+              "unit": "ml",
+              "foodId": "qingshui"
+            }
+          ],
+          "steps": [
+            "胡萝卜擦细丝（或切细末），小葱切花。",
+            "面粉 80 g 加 120 ml 清水，搅到无颗粒，再打入 3 个鸡蛋搅匀。",
+            "加胡萝卜丝、葱花、盐 0.5 g 拌匀，面糊应该能流动。",
+            "锅刷 3 g 油，小火烧热，倒一半面糊，转锅摊平，煎 2 分钟。",
+            "翻面再煎 1 分钟，出锅；剩下的 3 g 油煎第二张。"
+          ],
+          "tip": "面糊调到\"能流动但挂勺\"，饼才薄；全程小火，火大外面糊里面生。",
+          "kcal": 598,
+          "macros": {
+            "kcal": 598,
+            "carb": 70.5,
+            "protein": 31.7,
+            "fat": 21.9
+          },
+          "proteinPortion": "鸡蛋 3 个（去壳约 165 g）",
+          "dishId": "huluobo-jidan-bing",
+          "image": "dish/huluobo-jidan-bing.webp",
+          "method": "煎"
+        },
+        {
+          "slot": "午餐",
+          "name": "鱼香肉丝盖饭",
+          "items": [
+            {
+              "food": "猪精瘦肉",
+              "qty": 140,
+              "unit": "g",
+              "foodId": "zhujing-shourou"
+            },
+            {
+              "food": "米饭（生米）",
+              "qty": 100,
+              "unit": "g",
+              "foodId": "dami"
+            },
+            {
+              "food": "木耳（干）",
+              "qty": 10,
+              "unit": "g",
+              "foodId": "muer"
+            },
+            {
+              "food": "胡萝卜",
+              "qty": 50,
+              "unit": "g",
+              "foodId": "huluobo"
+            },
+            {
+              "food": "青椒",
+              "qty": 50,
+              "unit": "g",
+              "foodId": "qingjiao"
+            },
+            {
+              "food": "食用油",
+              "qty": 8,
+              "unit": "g",
+              "foodId": "shiyongyou"
+            },
+            {
+              "food": "郫县豆瓣酱",
+              "qty": 10,
+              "unit": "g",
+              "foodId": "doubanjiang"
+            },
+            {
+              "food": "生抽",
+              "qty": 6,
+              "unit": "ml",
+              "foodId": "shengchou"
+            },
+            {
+              "food": "醋",
+              "qty": 8,
+              "unit": "ml",
+              "foodId": "cu"
+            },
+            {
+              "food": "糖",
+              "qty": 5,
+              "unit": "g",
+              "foodId": "tang"
+            },
+            {
+              "food": "料酒",
+              "qty": 5,
+              "unit": "ml",
+              "foodId": "liaojiu"
+            },
+            {
+              "food": "淀粉",
+              "qty": 5,
+              "unit": "g",
+              "foodId": "dianfen"
+            },
+            {
+              "food": "蒜",
+              "qty": 2,
+              "unit": "瓣",
+              "foodId": "suan"
+            }
+          ],
+          "steps": [
+            "木耳提前用温水泡 20 分钟，切丝；胡萝卜、青椒切丝；蒜切末。",
+            "猪肉顺纹切细丝，加料酒 5 ml、生抽 2 ml、淀粉 3 g 抓匀，腌 10 分钟。",
+            "小碗调鱼香汁：生抽 4 ml、醋 8 ml、糖 5 g、淀粉 2 g、清水 30 ml。",
+            "锅烧到冒烟，下 8 g 油，大火下肉丝滑散，变白盛出。",
+            "原锅小火下豆瓣酱 10 g、蒜末，炒 30 秒出红油，下木耳、胡萝卜、青椒丝，大火炒 1 分钟。",
+            "倒回肉丝，淋鱼香汁，大火收汁到亮，浇在米饭上。"
+          ],
+          "tip": "鱼香汁的糖和醋是 1:1.6，先调好再下锅；豆瓣酱一定要小火炒出红油，别炒糊。",
+          "kcal": 662,
+          "macros": {
+            "kcal": 662,
+            "carb": 90.7,
+            "protein": 35.6,
+            "fat": 18.4
+          },
+          "proteinPortion": "猪精瘦肉 140 g",
+          "dishId": "yuxiang-rousi",
+          "image": "dish/yuxiang-rousi.webp",
+          "method": "炒"
+        },
+        {
+          "slot": "晚餐",
+          "name": "番茄肉片蛋花汤",
+          "items": [
+            {
+              "food": "猪精瘦肉",
+              "qty": 110,
+              "unit": "g",
+              "foodId": "zhujing-shourou"
+            },
+            {
+              "food": "米饭（生米）",
+              "qty": 80,
+              "unit": "g",
+              "foodId": "dami"
+            },
+            {
+              "food": "番茄",
+              "qty": 150,
+              "unit": "g",
+              "note": "约 1 个",
+              "foodId": "fanqie"
+            },
+            {
+              "food": "大白菜",
+              "qty": 100,
+              "unit": "g",
+              "foodId": "dabaicai"
+            },
+            {
+              "food": "鸡蛋",
+              "qty": 1,
+              "unit": "个",
+              "note": "去壳约 55 g",
+              "g": 55,
+              "foodId": "jidan"
+            },
+            {
+              "food": "食用油",
+              "qty": 8,
+              "unit": "g",
+              "foodId": "shiyongyou"
+            },
+            {
+              "food": "盐",
+              "qty": 0.5,
+              "unit": "g",
+              "foodId": "yan"
+            },
+            {
+              "food": "生抽",
+              "qty": 3,
+              "unit": "ml",
+              "foodId": "shengchou"
+            },
+            {
+              "food": "淀粉",
+              "qty": 2,
+              "unit": "g",
+              "foodId": "dianfen"
+            },
+            {
+              "food": "姜",
+              "qty": 2,
+              "unit": "片",
+              "foodId": "jiang"
+            }
+          ],
+          "steps": [
+            "猪肉切薄片，加淀粉 2 g、生抽 1 ml 抓匀；番茄去皮切块，白菜切丝。",
+            "锅放 8 g 油，下姜片、番茄炒 3 分钟到出沙。",
+            "加 600 ml 热水烧开，下白菜丝、肉片，煮 2 分钟。",
+            "加盐 0.5 g、生抽 2 ml，鸡蛋打散转圈淋入，静置 10 秒推成蛋花。",
+            "盛出配米饭。"
+          ],
+          "tip": "肉片切薄、下锅别搅，煮 2 分钟就嫩；蛋花淋进去等 10 秒再推。",
+          "kcal": 622,
+          "macros": {
+            "kcal": 622,
+            "carb": 72.4,
+            "protein": 36.5,
+            "fat": 21.2
+          },
+          "proteinPortion": "猪精瘦肉 110 g + 鸡蛋 1 个",
+          "dishId": "fanqie-roupian-danhua",
+          "image": "dish/fanqie-roupian-danhua.webp",
+          "method": "汤"
+        }
+      ],
+      "tonightNotes": [],
+      "notes": []
+    }
+  ],
+  "events": [
+    {
+      "at": "2026-10-18T21:00",
+      "type": "thaw",
+      "food": "鸡胸",
+      "qty": 260,
+      "unit": "g",
+      "forDate": "2026-10-19",
+      "note": "周一午餐 160 + 晚餐 100"
+    },
+    {
+      "at": "2026-10-19T21:00",
+      "type": "thaw",
+      "food": "鸡胸",
+      "qty": 200,
+      "unit": "g",
+      "pack": "1 片（约 200 g）",
+      "forDate": "2026-10-20",
+      "note": "周二午餐 160 + 晚餐 40"
+    },
+    {
+      "at": "2026-10-20T21:00",
+      "type": "thaw",
+      "food": "牛腿肉",
+      "qty": 330,
+      "unit": "g",
+      "pack": "330 g 那一块",
+      "forDate": "2026-10-21",
+      "note": "周三早餐 60 + 午餐 150 + 晚餐 120"
+    },
+    {
+      "at": "2026-10-21T21:00",
+      "type": "thaw",
+      "food": "猪精瘦肉",
+      "qty": 1000,
+      "unit": "g",
+      "pack": "整块",
+      "forDate": "2026-10-22",
+      "note": "唯一一次整块解冻，次日早分装"
+    },
+    {
+      "at": "2026-10-22T07:00",
+      "type": "split",
+      "food": "猪精瘦肉",
+      "qty": 1000,
+      "unit": "g",
+      "split": [
+        {
+          "g": 190,
+          "forDate": "2026-10-22"
+        },
+        {
+          "g": 290,
+          "forDate": "2026-10-23"
+        },
+        {
+          "g": 270,
+          "forDate": "2026-10-24"
+        },
+        {
+          "g": 250,
+          "forDate": "2026-10-25"
+        }
+      ],
+      "note": "趁半解冻切四袋，冷藏，按顺序四天吃完，不回冻"
+    },
+    {
+      "at": "2026-10-20T18:00",
+      "type": "open",
+      "food": "卤水豆腐",
+      "qty": 400,
+      "unit": "g",
+      "note": "切开用 200 g，剩 200 g 泡凉白开加盐冷藏"
+    },
+    {
+      "at": "2026-10-22T18:00",
+      "type": "finish",
+      "food": "卤水豆腐",
+      "qty": 200,
+      "unit": "g",
+      "expireAt": "2026-10-24",
+      "note": "保质期前吃完"
+    }
+  ],
+  "shopping": [
+    {
+      "batch": "采购一",
+      "when": "2026-10-18T20:00",
+      "covers": "10/19–10/22 早午餐",
+      "items": [
+        {
+          "food": "番茄",
+          "qty": 600,
+          "unit": "g",
+          "note": "约 4 个",
+          "use": "周一早 150、周三晚 300、周四早 150",
+          "expireAt": "2026-10-24",
+          "foodId": "fanqie"
+        },
+        {
+          "food": "青椒",
+          "qty": 400,
+          "unit": "g",
+          "note": "约 4 个",
+          "use": "周二午 150、周三午 100、周四午 150",
+          "expireAt": "2026-10-25",
+          "foodId": "qingjiao"
+        },
+        {
+          "food": "黄瓜",
+          "qty": 1,
+          "unit": "根",
+          "note": "约 200 g",
+          "use": "周一午 80，余下生吃",
+          "expireAt": "2026-10-23",
+          "foodId": "huanggua"
+        },
+        {
+          "food": "胡萝卜",
+          "qty": 3,
+          "unit": "根",
+          "note": "约 450 g",
+          "use": "周一 30、周五 50、周日 130",
+          "expireAt": "2026-11-01",
+          "foodId": "huluobo"
+        },
+        {
+          "food": "洋葱",
+          "qty": 1,
+          "unit": "个",
+          "note": "约 250 g",
+          "use": "周三午 150",
+          "expireAt": "2026-11-01",
+          "foodId": "yangcong"
+        },
+        {
+          "food": "香菇",
+          "qty": 100,
+          "unit": "g",
+          "use": "周三早 100",
+          "expireAt": "2026-10-22",
+          "foodId": "xianggu"
+        },
+        {
+          "food": "青蒜",
+          "qty": 1,
+          "unit": "把",
+          "note": "约 100 g",
+          "use": "周二晚 30，余下当葱花",
+          "expireAt": "2026-10-25",
+          "foodId": "qingsuan"
+        },
+        {
+          "food": "花生米",
+          "qty": 100,
+          "unit": "g",
+          "use": "周一午 15",
+          "shelfLife": "1 个月",
+          "foodId": "huashengmi"
+        },
+        {
+          "food": "粉丝",
+          "qty": 1,
+          "unit": "小包",
+          "note": "100 g",
+          "use": "周五晚 20",
+          "shelfLife": "6 个月",
+          "foodId": "fensi"
+        },
+        {
+          "food": "干木耳",
+          "qty": 1,
+          "unit": "小包",
+          "note": "50 g",
+          "use": "周日午 10",
+          "shelfLife": "12 个月",
+          "foodId": "muer"
+        },
+        {
+          "food": "郫县豆瓣酱",
+          "qty": 1,
+          "unit": "袋",
+          "note": "200 g",
+          "use": "周二晚 10、周日午 10",
+          "shelfLife": "6 个月",
+          "foodId": "doubanjiang"
+        },
+        {
+          "food": "面粉（中筋）",
+          "qty": 0,
+          "unit": "g",
+          "note": "已买，不用再买",
+          "use": "周日早 80",
+          "shelfLife": "6 个月",
+          "foodId": "mianfen"
+        },
+        {
+          "food": "姜、蒜、小葱",
+          "qty": 1,
+          "unit": "份",
+          "note": "各 1 份",
+          "use": "全周",
+          "shelfLife": "2 周",
+          "foodId": "jiang"
+        },
+        {
+          "food": "干辣椒、花椒",
+          "qty": 1,
+          "unit": "小包",
+          "note": "各 1 小包",
+          "use": "周一、周二、周五",
+          "shelfLife": "1 年",
+          "foodId": "ganlajiao"
+        }
+      ]
+    },
+    {
+      "batch": "采购二",
+      "when": "2026-10-22T08:00",
+      "covers": "10/22 晚餐–10/25",
+      "items": [
+        {
+          "food": "大白菜",
+          "qty": 1,
+          "unit": "颗",
+          "note": "约 1 kg",
+          "use": "周四晚 300、周五 350、周六 100、周日 100",
+          "expireAt": "2026-11-04",
+          "foodId": "dabaicai"
+        },
+        {
+          "food": "蒜苔",
+          "qty": 200,
+          "unit": "g",
+          "use": "周六午 150",
+          "expireAt": "2026-10-28",
+          "foodId": "suantai"
+        },
+        {
+          "food": "芹菜",
+          "qty": 250,
+          "unit": "g",
+          "use": "周五午 200",
+          "expireAt": "2026-10-28",
+          "foodId": "qincai"
+        },
+        {
+          "food": "番茄",
+          "qty": 200,
+          "unit": "g",
+          "note": "约 1 个大的",
+          "use": "周日晚 150",
+          "expireAt": "2026-10-28",
+          "foodId": "fanqie"
+        },
+        {
+          "food": "青椒",
+          "qty": 200,
+          "unit": "g",
+          "note": "约 2 个",
+          "use": "周六晚 100、周日午 50",
+          "expireAt": "2026-10-29",
+          "foodId": "qingjiao"
+        },
+        {
+          "food": "香菇",
+          "qty": 200,
+          "unit": "g",
+          "use": "周六早 50、周六晚 150",
+          "expireAt": "2026-10-26",
+          "foodId": "xianggu"
+        }
+      ]
+    }
+  ],
+  "pantry": [
+    {
+      "foodId": "niurou",
+      "food": "牛腿肉",
+      "unit": "g",
+      "base": 990.0,
+      "tracked": true,
+      "cat": "肉"
+    },
+    {
+      "foodId": "zhujing-shourou",
+      "food": "猪精瘦肉",
+      "unit": "g",
+      "base": 1000.0,
+      "tracked": true,
+      "cat": "肉"
+    },
+    {
+      "foodId": "zhuliji",
+      "food": "猪里脊",
+      "unit": "g",
+      "base": 500.0,
+      "tracked": true,
+      "cat": "肉"
+    },
+    {
+      "foodId": "jixiong",
+      "food": "鸡胸",
+      "unit": "g",
+      "base": 1500.0,
+      "tracked": true,
+      "cat": "肉"
+    },
+    {
+      "foodId": "jidan",
+      "food": "鸡蛋",
+      "unit": "个",
+      "base": 30.0,
+      "tracked": true,
+      "cat": "蛋"
+    },
+    {
+      "foodId": "baojian-doufu",
+      "food": "包浆豆腐",
+      "unit": "g",
+      "base": 380.0,
+      "tracked": true,
+      "cat": "豆"
+    },
+    {
+      "foodId": "lvshui-doufu",
+      "food": "卤水豆腐",
+      "unit": "g",
+      "base": 400.0,
+      "tracked": true,
+      "cat": "豆"
+    },
+    {
+      "foodId": "shanghai-qing",
+      "food": "上海青",
+      "unit": "g",
+      "base": 500.0,
+      "tracked": true,
+      "cat": "蔬菜"
+    },
+    {
+      "foodId": "dabaicai",
+      "food": "大白菜",
+      "unit": "g",
+      "base": 1000.0,
+      "tracked": true,
+      "cat": "蔬菜"
+    },
+    {
+      "foodId": "yangcong",
+      "food": "洋葱",
+      "unit": "g",
+      "base": 250.0,
+      "tracked": true,
+      "cat": "蔬菜"
+    },
+    {
+      "foodId": "fanqie",
+      "food": "番茄",
+      "unit": "g",
+      "base": 800.0,
+      "tracked": true,
+      "cat": "蔬菜"
+    },
+    {
+      "foodId": "huluobo",
+      "food": "胡萝卜",
+      "unit": "g",
+      "base": 450.0,
+      "tracked": true,
+      "cat": "蔬菜"
+    },
+    {
+      "foodId": "qincai",
+      "food": "芹菜",
+      "unit": "g",
+      "base": 250.0,
+      "tracked": true,
+      "cat": "蔬菜"
+    },
+    {
+      "foodId": "bocai",
+      "food": "菠菜",
+      "unit": "g",
+      "base": 500.0,
+      "tracked": true,
+      "cat": "蔬菜"
+    },
+    {
+      "foodId": "suantai",
+      "food": "蒜苔",
+      "unit": "g",
+      "base": 200.0,
+      "tracked": true,
+      "cat": "蔬菜"
+    },
+    {
+      "foodId": "qingjiao",
+      "food": "青椒",
+      "unit": "g",
+      "base": 600.0,
+      "tracked": true,
+      "cat": "蔬菜"
+    },
+    {
+      "foodId": "qingsuan",
+      "food": "青蒜",
+      "unit": "g",
+      "base": 100.0,
+      "tracked": true,
+      "cat": "蔬菜"
+    },
+    {
+      "foodId": "huanggua",
+      "food": "黄瓜",
+      "unit": "g",
+      "base": 200.0,
+      "tracked": true,
+      "cat": "蔬菜"
+    },
+    {
+      "foodId": "xianggu",
+      "food": "香菇",
+      "unit": "g",
+      "base": 300.0,
+      "tracked": true,
+      "cat": "菌菇"
+    },
+    {
+      "foodId": "dami",
+      "food": "大米",
+      "unit": "g",
+      "base": 0.0,
+      "tracked": false,
+      "cat": "主食"
+    },
+    {
+      "foodId": "niangao",
+      "food": "年糕",
+      "unit": "g",
+      "base": 0.0,
+      "tracked": false,
+      "cat": "主食"
+    },
+    {
+      "foodId": "guamian",
+      "food": "挂面",
+      "unit": "g",
+      "base": 0.0,
+      "tracked": false,
+      "cat": "主食"
+    },
+    {
+      "foodId": "mianfen",
+      "food": "面粉",
+      "unit": "g",
+      "base": 0.0,
+      "tracked": false,
+      "cat": "主食"
+    },
+    {
+      "foodId": "muer",
+      "food": "干木耳",
+      "unit": "g",
+      "base": 50.0,
+      "tracked": true,
+      "cat": "干货"
+    },
+    {
+      "foodId": "fensi",
+      "food": "粉丝",
+      "unit": "g",
+      "base": 100.0,
+      "tracked": true,
+      "cat": "干货"
+    },
+    {
+      "foodId": "huashengmi",
+      "food": "花生米",
+      "unit": "g",
+      "base": 100.0,
+      "tracked": true,
+      "cat": "坚果"
+    },
+    {
+      "foodId": "jiang",
+      "food": "姜、蒜、小葱",
+      "unit": "份",
+      "base": 1.0,
+      "tracked": false,
+      "cat": "调味"
+    },
+    {
+      "foodId": "ganlajiao",
+      "food": "干辣椒、花椒",
+      "unit": "小包",
+      "base": 1.0,
+      "tracked": false,
+      "cat": "调味"
+    },
+    {
+      "foodId": "doubanjiang",
+      "food": "郫县豆瓣酱",
+      "unit": "g",
+      "base": 200.0,
+      "tracked": false,
+      "cat": "调味"
+    }
+  ]
+}

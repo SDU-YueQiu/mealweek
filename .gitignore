@@ -1,0 +1,16 @@
+# python
+__pycache__/
+*.py[cod]
+
+# personal data — never commit
+weeks/*/events.jsonl
+weeks/*/diagnosis.md
+certs/*.pem
+certs/*.crt
+certs/*.key
+certs/*.pfx
+docs/*.png
+
+# os
+.DS_Store
+Thumbs.db
