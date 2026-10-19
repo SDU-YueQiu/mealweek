@@ -14,3 +14,11 @@ docs/*.png
 # os
 .DS_Store
 Thumbs.db
+
+# runtime data (keep only the demo)
+weeks/*/
+!weeks/demo/
+assets/food/
+assets/dish/
+assets/credits.json
+week-*.json

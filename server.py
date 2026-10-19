@@ -59,7 +59,8 @@ def latest_week_dir():
              and os.path.exists(os.path.join(WEEKS, d, "week.json"))]
     if not cands:
         return None
-    return os.path.join(WEEKS, sorted(cands)[-1])
+    dated = [d for d in cands if re.match(r"^\d{4}-W\d{2}$", d)]
+    return os.path.join(WEEKS, sorted(dated or cands)[-1])
 
 
 def load_week():
