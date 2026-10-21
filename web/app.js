@@ -514,12 +514,13 @@
 
   function dayPage(d, di) {
     const t = state.week.targets;
+    const tr = (d.target && d.target.range) || t.range;
     const tot = d.totals;
     const cells = [
-      ['热量', Math.round(tot.kcal), 'kcal', t.range.kcal],
-      ['碳水', tot.carb, 'g', t.range.carb],
-      ['蛋白', tot.protein, 'g', t.range.protein],
-      ['脂肪', tot.fat, 'g', t.range.fat],
+      ['热量', Math.round(tot.kcal), 'kcal', tr.kcal],
+      ['碳水', tot.carb, 'g', tr.carb],
+      ['蛋白', tot.protein, 'g', tr.protein],
+      ['脂肪', tot.fat, 'g', tr.fat],
     ];
 
     const totals = `<div class="totals">${cells.map(([k, v, u, r]) => `
@@ -980,9 +981,11 @@
   function renderWeek() {
     const w = state.week;
     const today = todayIso();
+    const rangeOf = (d) => (d.target && d.target.range) || w.targets.range;
     const rows = w.days.map((d, i) => {
       const cur = i === state.day;
-      const ok = d.totals.kcal >= w.targets.range.kcal[0] && d.totals.kcal <= w.targets.range.kcal[1];
+      const r = rangeOf(d).kcal;
+      const ok = d.totals.kcal >= r[0] && d.totals.kcal <= r[1];
       return `<div class="wrow ${cur ? 'cur' : ''}" data-act="jump" data-di="${i}">
         <div class="dd"><b>${Number(d.date.slice(8, 10))}</b><small>${esc(d.label)}</small></div>
         <div class="mm">${d.meals.map((m) => `<div>${esc(m.name)}</div>`).join('')}</div>
@@ -991,7 +994,10 @@
     }).join('');
 
     const wt = state.data.weight == null ? '' : state.data.weight;
-    const passing = w.days.filter((d) => d.totals.kcal >= w.targets.range.kcal[0] && d.totals.kcal <= w.targets.range.kcal[1]).length;
+    const passing = w.days.filter((d) => {
+      const r = rangeOf(d).kcal;
+      return d.totals.kcal >= r[0] && d.totals.kcal <= r[1];
+    }).length;
     app.innerHTML = `${pageHead('本周', w.start.slice(5).replace('-', '/') + ' – ' + w.end.slice(5).replace('-', '/'))}
       <div class="sec"><h2>每日合计</h2><span>${passing}/${w.days.length} 天达标</span></div>
       ${rows}

@@ -43,7 +43,7 @@ def main():
             check(abs(s - d["totals"][k]) <= 0.15, "%s %s 合计 %.1f = 三餐和 %.1f" % (d["date"], k, d["totals"][k], s))
         for k in ("kcal", "carb", "protein", "fat"):
             v = d["totals"][k]
-            lo, hi = rng[k]
+            lo, hi = ((d.get("target") or {}).get("range") or rng)[k]
             check(lo <= v <= hi, "%s %s %.1f 在 %s–%s" % (d["date"], k, v, lo, hi), soft=True)
         for m in d["meals"]:
             check(bool(m.get("dishId")), "%s %s 有 dishId" % (d["date"], m["slot"]))

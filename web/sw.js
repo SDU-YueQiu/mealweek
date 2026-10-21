@@ -1,7 +1,7 @@
 /* MealWeek service worker: shell + week + every image, so an installed
    app opens instantly with the PC off and away from the wifi.
    Bump V whenever index.html / app.js / style.css / sw.js changes. */
-const V = 'mw-v26';
+const V = 'mw-v27';
 const ASSETS = 'mw-assets-v1';
 const SHELL = ['/', '/index.html', '/style.css', '/app.js', '/manifest.webmanifest'];
 
@@ -162,5 +162,6 @@ self.addEventListener('fetch', (e) => {
     e.respondWith(cacheFirst(req, V));
   }
 });
+
 
 
