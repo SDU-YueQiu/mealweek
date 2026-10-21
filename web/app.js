@@ -195,6 +195,7 @@
     if (!mine.length) return;
     state.flushing = true;
     const batch = mine.slice(0, 100);
+    let more = false;
     try {
       const r = await fetchT(api('/api/events'), {
         method: 'POST',
@@ -211,11 +212,15 @@
       state.online = true;
       state.lastSync = new Date().toISOString();
       store('mw:lastSync', state.lastSync);
+      // Taps that arrived while this request was in flight (eg. 全买了) still
+      // sit in the queue; send them now instead of waiting for the next tick.
+      more = state.queue.some((e) => !e.week || e.week === state.week.id);
     } catch (e) {
       state.online = false;
     } finally {
       state.flushing = false;
       paintSync();
+      if (more) flush();
     }
   }
 
