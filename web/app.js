@@ -44,6 +44,7 @@
     customUrls: {},
     prefetch: null,
     pack: PACK,
+    collapsed: {},
   };
 
   const esc = (s) => String(s == null ? '' : s).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
@@ -147,6 +148,7 @@
     state.queue = read('mw:queue', []);
     state.lastSync = read('mw:lastSync', null);
     state.prefetch = read('mw:prefetch', null);
+    state.collapsed = read('mw:collapsed:' + payload.week.id, {}) || {};
     for (const k of ['meals', 'shopping', 'days', 'thaw', 'pantry']) {
       if (!state.data[k] || typeof state.data[k] !== 'object') state.data[k] = {};
     }
@@ -649,6 +651,7 @@
     const batches = w.shopping.map((b) => {
       const total = b.items.length;
       const done = b.items.filter((it) => state.data.shopping[b.batch + '|' + it.food]).length;
+      const collapsed = batchCollapsed(b.batch, done, total);
       const rows = b.items.map((it) => {
         const key = b.batch + '|' + it.food;
         const ok = !!state.data.shopping[key];
@@ -665,15 +668,25 @@
         </div>`;
       }).join('');
       const when = b.when ? md(b.when.slice(0, 10)) : '';
-      return `<section class="batch">
-        <div class="batch-head"><h3>${esc(b.batch)}</h3><small>${esc(when)} · ${esc(b.covers || '')}</small>
-          <span class="prog" data-prog="${esc(b.batch)}">已买 ${done}/${total}</span></div>
+      return `<section class="batch ${collapsed ? 'collapsed' : ''}">
+        <button class="batch-head" data-act="batch" data-batch="${esc(b.batch)}" aria-expanded="${!collapsed}">
+          <h3>${esc(b.batch)}</h3><small>${esc(when)} · ${esc(b.covers || '')}</small>
+          <span class="prog" data-prog="${esc(b.batch)}">已买 ${done}/${total}</span>
+          <span class="chev" aria-hidden="true">›</span>
+        </button>
         ${rows}
       </section>`;
     }).join('');
 
     app.innerHTML = `${pageHead('买菜')}${batches}`;
     paintSync();
+  }
+
+  // A finished batch folds away, the one you are still shopping stays open.
+  function batchCollapsed(batch, done, total) {
+    const saved = state.collapsed ? state.collapsed[batch] : undefined;
+    if (saved === undefined) return total > 0 && done === total;
+    return !!saved;
   }
 
   /* ---------------- cyber fridge ---------------- */
@@ -798,48 +811,11 @@
       ${urgent.length > 3 ? `<span class="ea more">+${urgent.length - 3}</span>` : ''}</div>`;
   }
 
-  // Planned-but-not-bought rows, grouped by shopping trip.
-  function pendingParts() {
-    const out = [];
-    for (const p of pantryList()) {
-      if (!p.tracked) continue;
-      for (const part of pantryParts(p)) {
-        if (!partBought(part) && (Number(part.qty) || 0) > 0) out.push({ p, part });
-      }
-    }
-    return out.sort((a, b) => String(a.part.at || '').localeCompare(String(b.part.at || ''))
-      || String(a.part.src || '').localeCompare(String(b.part.src || '')));
-  }
-
-  function pendingBlock() {
-    const rows = pendingParts();
-    if (!rows.length) return '';
-    const groups = [];
-    for (const r of rows) {
-      let g = groups.find((x) => x.batch === r.part.src);
-      if (!g) groups.push(g = { batch: r.part.src, at: r.part.at, rows: [] });
-      g.rows.push(r);
-    }
-    return `<div class="pend">
-      <div class="pend-head"><b>还没买</b><span>不计入冰箱 · 买了点一下</span></div>
-      ${groups.map((g) => `<div class="pend-batch">
-        <div class="pend-bh"><span>${esc(g.batch)}</span><small>${g.at ? shortDate(g.at) + ' 买' : ''}</small>
-          <button class="pend-all" data-act="buy-all" data-batch="${esc(g.batch)}">全买了</button></div>
-        ${g.rows.map(({ p, part }) => `<div class="pend-row">
-          ${img('food', p.foodId, '', p.food)}
-          <div class="st-main"><div class="st-top"><b>${esc(p.food)}</b><span class="st-num">${fmtAmt(part.qty, part.unit)}</span></div>
-          <div class="st-sub">计划里要买 · 买了才算进冰箱</div></div>
-          <button class="pend-add" data-act="buy" data-batch="${esc(g.batch)}" data-food="${esc(part.food)}">买了</button>
-        </div>`).join('')}
-      </div>`).join('')}
-    </div>`;
-  }
-
   function renderFridge() {
     const used = pantryUsed();
     const items = pantryList();
     const cats = ['肉', '蛋', '豆', '蔬菜', '菌菇', '主食', '干货', '坚果', '调味'];
-    let html = pageHead('冰箱', '只算买到的，照做自动扣') + expirySummary(used) + pendingBlock();
+    let html = pageHead('冰箱', '只算买到的，照做自动扣') + expirySummary(used);
     let shown = 0;
     for (const cat of cats) {
       const list = items.filter((p) => p.cat === cat)
@@ -861,7 +837,6 @@
         shown++;
         const left = pantryShown(p, used);
         const stock = pantryStock(p);
-        const waiting = pantryWaiting(p);
         const manual = state.data.pantry && state.data.pantry[p.foodId] != null;
         const pct = stock > 0 ? Math.max(0, Math.min(100, left / stock * 100)) : 0;
         html += `<button class="stock-row" data-act="pantry" data-id="${p.foodId}">
@@ -869,15 +844,15 @@
           <div class="st-main">
             <div class="st-top"><b>${esc(p.food)}</b><span class="st-num">${fmtAmt(left, p.unit)}</span></div>
             <div class="bar"><i style="width:${pct}%"></i></div>
-            <div class="st-sub">买到 ${fmtAmt(stock, p.unit)} · 已用 ${fmtAmt(used[p.foodId] || 0, p.unit)}${manual ? ' · 手动' : ''}${waiting > 0 ? ` · 没买 ${fmtAmt(waiting, p.unit)}` : ''}</div>
+            <div class="st-sub">买到 ${fmtAmt(stock, p.unit)} · 已用 ${fmtAmt(used[p.foodId] || 0, p.unit)}${manual ? ' · 手动' : ''}</div>
             ${expiryLine({ expireAt: pantryExpireAt(p), state: p.state })}
           </div>
         </button>`;
       }
       html += `</div>`;
     }
-    if (!shown && !pendingParts().length) {
-      html += `<div class="empty">冰箱是空的。<br>去「买菜」打勾，买回来的东西才会出现在这里。</div>`;
+    if (!shown) {
+      html += `<div class="empty">冰箱是空的。<br>买的菜在「买菜」打勾后才会进来。</div>`;
     }
     app.innerHTML = html;
     paintSync();
@@ -1358,35 +1333,14 @@
       return;
     }
 
-    if (act === 'buy') {
+    if (act === 'batch') {
       const batch = el.dataset.batch;
-      const food = el.dataset.food;
-      const key = batch + '|' + food;
-      if (!state.data.shopping[key]) {
-        state.data.shopping[key] = true;
-        saveData();
-        pushEvent({ type: 'shopping', batch, food, checked: true });
-      }
-      showToast(food + ' 已进冰箱');
-      render();
-      return;
-    }
-
-    if (act === 'buy-all') {
-      const batch = el.dataset.batch;
-      const b = state.week.shopping.find((x) => x.batch === batch);
-      let n = 0;
-      for (const it of (b ? b.items : [])) {
-        const key = batch + '|' + it.food;
-        if (!state.data.shopping[key]) {
-          state.data.shopping[key] = true;
-          pushEvent({ type: 'shopping', batch, food: it.food, checked: true });
-          n++;
-        }
-      }
-      saveData();
-      showToast(n ? `${batch} 都进冰箱了` : '这批已经买齐了');
-      render();
+      const sec = el.closest('.batch');
+      const next = !(sec && sec.classList.contains('collapsed'));
+      state.collapsed[batch] = next;
+      store('mw:collapsed:' + state.week.id, state.collapsed);
+      if (sec) sec.classList.toggle('collapsed', next);
+      el.setAttribute('aria-expanded', String(!next));
       return;
     }
 
