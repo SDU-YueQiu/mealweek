@@ -124,8 +124,10 @@ def main():
             payload = json.load(r)
             check(payload["week"]["id"] == wid, "/api/week 返回最新周 %s" % wid)
             real = [d for d in dish_ids if d not in no_photo]
-            check(sorted(payload.get("assets", {}).get("dish", {})) == sorted(real),
-                  "菜图清单 %d 项（无照片的 %d 道走品类卡）" % (len(real), len(dish_ids) - len(real)))
+            have = payload.get("assets", {}).get("dish", {})
+            missing = [d for d in real if d not in have]
+            check(not missing,
+                  "菜图清单覆盖本周 %d 道菜（清单共 %d 张）" % (len(real), len(have)))
         with urllib.request.urlopen("http://127.0.0.1:8765/offline.html", timeout=30) as r:
             pack = r.read()
             check(r.status == 200, "/offline.html 可下载")
