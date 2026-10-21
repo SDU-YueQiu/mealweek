@@ -2,6 +2,21 @@
 (() => {
   'use strict';
 
+  const OFFLINE = window.MW_OFFLINE || null;
+  const PACK = !!(OFFLINE && OFFLINE.week);
+  const PACK_BASE = (OFFLINE && OFFLINE.serverBase) || '';
+  const IS_FILE = location.protocol === 'file:';
+  const MOBILE = /Android|iPhone|iPad|iPod|Mobile/i.test(navigator.userAgent);
+  const SECURE = (typeof window.isSecureContext === 'boolean')
+    ? window.isSecureContext
+    : (location.protocol === 'https:' || /^(localhost|127\.0\.0\.1)$/.test(location.hostname));
+  const INSTALLED = () => {
+    try { return window.matchMedia('(display-mode: standalone)').matches || !!navigator.standalone; } catch (e) { return false; }
+  };
+  const SW_READY = () => {
+    try { return !!navigator.serviceWorker && !!navigator.serviceWorker.controller; } catch (e) { return false; }
+  };
+
   const $ = (s, el = document) => el.querySelector(s);
   const app = $('#app');
   const tabsEl = $('#tabs');
@@ -23,10 +38,12 @@
     data: { meals: {}, shopping: {}, days: {}, thaw: {}, weight: null },
     queue: [],
     sheet: null,
-    online: true,
+    online: false,
     flushing: false,
     lastSync: null,
     customUrls: {},
+    prefetch: null,
+    pack: PACK,
   };
 
   const esc = (s) => String(s == null ? '' : s).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
@@ -44,6 +61,21 @@
   }
   function read(key, fallback) {
     try { const v = localStorage.getItem(key); return v ? JSON.parse(v) : fallback; } catch (e) { return fallback; }
+  }
+
+  // Never let a dead LAN address hold the first paint hostage.
+  function fetchT(input, opts, ms) {
+    const ctrl = new AbortController();
+    const t = setTimeout(() => ctrl.abort(), ms || 6000);
+    return fetch(input, Object.assign({}, opts, { signal: ctrl.signal }))
+      .finally(() => clearTimeout(t));
+  }
+
+  // The standalone offline file is on file://, so relative /api calls would
+  // hit nothing.  It carries the LAN address it was generated from.
+  function api(path) {
+    if (PACK && PACK_BASE) return PACK_BASE.replace(/\/+$/, '') + path;
+    return path;
   }
 
   /* ---------------- custom dish photos (IndexedDB) ---------------- */
@@ -114,17 +146,21 @@
     });
     state.queue = read('mw:queue', []);
     state.lastSync = read('mw:lastSync', null);
-    if (!state.data.pantry) state.data.pantry = {};
+    state.prefetch = read('mw:prefetch', null);
+    for (const k of ['meals', 'shopping', 'days', 'thaw', 'pantry']) {
+      if (!state.data[k] || typeof state.data[k] !== 'object') state.data[k] = {};
+    }
   }
 
   async function fetchWeek() {
+    if (PACK) { state.online = false; return; }
     try {
-      const r = await fetch('/api/week', { cache: 'no-store' });
+      const r = await fetchT('/api/week', { cache: 'no-store' }, 6000);
       if (!r.ok) throw new Error('http ' + r.status);
       const d = await r.json();
       applyWeek(d);
       store('mw:week', d);
-      state.online = true;
+      state.online = r.headers.get('X-MW-Cache') !== '1';
     } catch (e) {
       state.online = false;
       const cached = read('mw:week', null);
@@ -147,6 +183,7 @@
   function pushEvent(obj) {
     obj.id = uid();
     obj.at = new Date().toISOString();
+    if (state.week) obj.week = state.week.id;
     state.queue.push(obj);
     store('mw:queue', state.queue);
     flush();
@@ -154,19 +191,26 @@
 
   async function flush() {
     if (state.flushing || !state.queue.length || !state.week) return;
+    const mine = state.queue.filter((e) => !e.week || e.week === state.week.id);
+    if (!mine.length) return;
     state.flushing = true;
-    const batch = state.queue.slice(0, 100);
+    const batch = mine.slice(0, 100);
     try {
-      const r = await fetch('/api/events', {
+      const r = await fetchT(api('/api/events'), {
         method: 'POST',
         headers: { 'content-type': 'application/json' },
         body: JSON.stringify({ week: state.week.id, events: batch }),
-      });
+      }, 6000);
       if (!r.ok) throw new Error('http ' + r.status);
+      let j = null;
+      try { j = await r.json(); } catch (e) { /* empty body */ }
+      if (j && j.week && j.week !== state.week.id) throw new Error('week mismatch');
       const ids = new Set(batch.map((e) => e.id));
       state.queue = state.queue.filter((e) => !ids.has(e.id));
       store('mw:queue', state.queue);
       state.online = true;
+      state.lastSync = new Date().toISOString();
+      store('mw:lastSync', state.lastSync);
     } catch (e) {
       state.online = false;
     } finally {
@@ -177,7 +221,10 @@
 
   let prefetching = false;
   async function prefetchAll(onProgress) {
-    if (!('caches' in window) || !state.week || prefetching) return { total: 0, fetched: 0 };
+    if (PACK) return { total: 0, fetched: 0, cached: 0, pack: true };
+    if (!('caches' in window) || !state.week || prefetching) {
+      return { total: 0, fetched: 0, cached: 0 };
+    }
     prefetching = true;
     const urls = [];
     for (const kind of ['dish', 'food']) {
@@ -185,38 +232,61 @@
       for (const id in m) urls.push(url(kind, id));
     }
     let fetched = 0;
+    let cached = 0;
     try {
       const cache = await caches.open('mw-assets-v1');
       for (let i = 0; i < urls.length; i++) {
         const u = urls[i];
-        if (await cache.match(u)) continue;
+        if (await cache.match(u)) { cached++; continue; }
         try {
-          const r = await fetch(u);
-          if (r && r.ok) { await cache.put(u, r); fetched++; }
+          const r = await fetchT(u, { cache: 'force-cache' }, 10000);
+          if (r && r.ok) { await cache.put(u, r); cached++; fetched++; }
         } catch (e) { /* offline */ }
         if (onProgress && i % 10 === 0) onProgress(i + 1, urls.length);
       }
     } catch (e) { /* no cache storage */ }
     prefetching = false;
-    return { total: urls.length, fetched };
+    const info = { week: state.week.id, total: urls.length, cached, at: new Date().toISOString() };
+    state.prefetch = info;
+    store('mw:prefetch', info);
+    return { total: urls.length, fetched, cached };
   }
 
   async function syncNow() {
-    showToast('同步中…');
-    await fetchWeek();
-    let res = { total: 0, fetched: 0 };
-    if (state.week) res = await prefetchAll((n, t) => { if (n % 20 === 0) showToast(`图片 ${n}/${t}`); });
+    showToast(PACK ? '正在找电脑…' : '同步中…');
+    if (!PACK) {
+      await fetchWeek();
+      if (!state.online) {
+        showToast('连不上电脑，继续用本地缓存');
+        paintSync();
+        return;
+      }
+    }
+    let res = { total: 0, fetched: 0, cached: 0 };
+    if (!PACK && state.week) {
+      res = await prefetchAll((n, t) => { if (n % 20 === 0) showToast(`图片 ${n}/${t}`); });
+    }
     await flush();
+    if (PACK || state.online) await loadEvents();
     if (state.online && state.week) {
-      await loadEvents();
       state.lastSync = new Date().toISOString();
       store('mw:lastSync', state.lastSync);
-      showToast(res.fetched ? `已同步 · 新下载 ${res.fetched} 张图` : '已同步 · 都是最新的');
-      render();
+      if (PACK) {
+        showToast(pendingCount() ? '反馈还存着，回 WiFi 再传' : '反馈已同步');
+      } else {
+        showToast(res.fetched ? `已同步 · 新下载 ${res.fetched} 张图` : '已同步 · 都是最新的');
+      }
+      if (!state.sheet && !state.pantryOpen) render();
+      showNotice();
     } else {
-      showToast('连不上电脑，继续用本地缓存');
+      showToast(PACK ? '连不上电脑，反馈先存在手机里' : '连不上电脑，继续用本地缓存');
     }
     paintSync();
+  }
+
+  function pendingCount() {
+    if (!state.week) return state.queue.length;
+    return state.queue.filter((e) => !e.week || e.week === state.week.id).length;
   }
 
   function paintSync() {
@@ -225,7 +295,8 @@
     const lab = $('.sync span');
     if (!lab) return;
     if (!state.online) {
-      lab.textContent = state.queue.length ? `待传 ${state.queue.length}` : '离线';
+      const n = pendingCount();
+      lab.textContent = n ? `待传 ${n}` : '离线';
       return;
     }
     if (state.lastSync) {
@@ -268,24 +339,67 @@
 
   async function loadEvents() {
     if (!state.week) return;
+    const path = '/api/events' + (PACK ? '?week=' + encodeURIComponent(state.week.id) : '');
     try {
-      const r = await fetch('/api/events', { cache: 'no-store' });
-      if (!r.ok) return;
+      const r = await fetchT(api(path), { cache: 'no-store' }, 6000);
+      const fromCache = r.headers.get('X-MW-Cache') === '1';
+      if (!r.ok) {
+        if (fromCache) state.online = false;
+        return;
+      }
+      if (fromCache) {
+        state.online = false;
+        let hasLocal = false;
+        try { hasLocal = !!localStorage.getItem('mw:data:' + state.week.id); } catch (e) { /* ignore */ }
+        // A cached /api/events can be older than feedback already saved on
+        // this phone; never let it erase what the user just did.
+        if (hasLocal) return;
+      } else {
+        state.online = true;
+      }
       const d = await r.json();
+      if (d.week && d.week !== state.week.id) return;
       const data = emptyData();
       const evs = (d.events || []).slice().sort((a, b) => String(a.at).localeCompare(String(b.at)));
       for (const e of evs) applyEvent(data, e);
-      for (const e of state.queue.slice().sort((a, b) => String(a.at).localeCompare(String(b.at)))) applyEvent(data, e);
+      for (const e of state.queue
+        .filter((x) => !x.week || x.week === state.week.id)
+        .sort((a, b) => String(a.at).localeCompare(String(b.at)))) applyEvent(data, e);
       state.data = data;
       saveData();
-    } catch (e) { /* offline: keep the local cache */ }
+      store('mw:events:' + state.week.id, evs);
+    } catch (e) {
+      state.online = false;
+      /* offline: keep the local cache */
+    }
+  }
+
+  // First open of a downloaded pack: rebuild local state from the snapshot
+  // baked into the file, so feedback from before the download is visible.
+  function seedPackEvents(events) {
+    if (!PACK || !state.week || !events || !events.length) return false;
+    const key = 'mw:data:' + state.week.id;
+    let hasLocal = false;
+    try { hasLocal = !!localStorage.getItem(key); } catch (e) { /* ignore */ }
+    if (hasLocal) return false;
+    const data = emptyData();
+    const evs = events.slice().sort((a, b) => String(a.at).localeCompare(String(b.at)));
+    for (const e of evs) applyEvent(data, e);
+    for (const e of state.queue
+      .filter((x) => !x.week || x.week === state.week.id)
+      .sort((a, b) => String(a.at).localeCompare(String(b.at)))) applyEvent(data, e);
+    if (!evs.length && !state.queue.length) return false;
+    state.data = data;
+    saveData();
+    return true;
   }
 
   /* ---------------- assets ---------------- */
 
   function url(kind, id) {
     const h = state.assets && state.assets[kind] ? state.assets[kind][id] : null;
-    return `/assets/${kind}/${encodeURIComponent(id)}.webp${h ? '?v=' + h : ''}`;
+    const p = `/assets/${kind}/${encodeURIComponent(id)}.webp${h ? '?v=' + h : ''}`;
+    return (PACK && OFFLINE.images && OFFLINE.images[p]) || p;
   }
 
   const ART = {
@@ -561,6 +675,38 @@
 
   function pantryList() { return state.week.pantry || []; }
 
+  // A pantry row is the sum of its sources: what you already had before the
+  // week, plus each shopping batch.  A batch only counts after its items are
+  // ticked on the 买菜 page, so Friday's plan never appears in the fridge on
+  // Wednesday.
+  function pantryParts(p) {
+    if (Array.isArray(p.parts) && p.parts.length) return p.parts;
+    return [{ src: 'before', food: p.food, qty: p.base || 0, unit: p.unit,
+              at: p.stockedAt || null, expireAt: p.expireAt || null }];
+  }
+
+  function partBought(part) {
+    if (!part || part.src === 'before') return true;
+    return !!state.data.shopping[part.src + '|' + (part.food || '')];
+  }
+
+  function sumParts(p, want) {
+    let sum = 0;
+    for (const q of pantryParts(p)) {
+      if (partBought(q) === want && (!q.unit || q.unit === p.unit)) sum += Number(q.qty) || 0;
+    }
+    return sum;
+  }
+
+  function pantryStock(p) { return sumParts(p, true); }
+  function pantryWaiting(p) { return sumParts(p, false); }
+
+  function pantryExpireAt(p) {
+    const dates = pantryParts(p).filter((q) => partBought(q) && q.expireAt).map((q) => String(q.expireAt));
+    if (!dates.length) return p.expireAt || null;
+    return dates.sort()[0];
+  }
+
   function pantryUsed() {
     const used = {};
     for (const d of state.week.days) {
@@ -581,7 +727,7 @@
   }
 
   function pantryAuto(p, used) {
-    return Math.max(0, (p.base || 0) - (used[p.foodId] || 0));
+    return Math.max(0, pantryStock(p) - (used[p.foodId] || 0));
   }
 
   function pantryShown(p, used) {
@@ -598,35 +744,135 @@
     return Math.round(v) + ' ' + (unit || '');
   }
 
+  function daysUntil(isoDate) {
+    if (!isoDate) return null;
+    const parts = String(isoDate).slice(0, 10).split('-').map(Number);
+    if (parts.length !== 3 || parts.some((n) => !isFinite(n))) return null;
+    const target = new Date(parts[0], parts[1] - 1, parts[2]);
+    const now = new Date();
+    const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+    return Math.round((target - today) / 86400000);
+  }
+
+  function shortDate(isoDate) {
+    if (!isoDate) return '';
+    const p = String(isoDate).slice(0, 10).split('-').map(Number);
+    if (p.length !== 3 || p.some((n) => !isFinite(n))) return esc(isoDate);
+    const year = new Date().getFullYear();
+    return (p[0] !== year ? p[0] + '/' : '') + p[1] + '/' + p[2];
+  }
+
+  function expiryInfo(p) {
+    const days = daysUntil(p && p.expireAt);
+    if (days == null) return { days: null, cls: 'none', text: '保质期未标', date: '' };
+    let cls = 'ok';
+    let text = `还剩 ${days} 天`;
+    if (days < 0) { cls = 'expired'; text = `已过期 ${-days} 天`; }
+    else if (days === 0) { cls = 'expired'; text = '今天吃完'; }
+    else if (days <= 7) { cls = 'soon'; }
+    return { days, cls, text, date: shortDate(p.expireAt) };
+  }
+
+  function expiryLine(p) {
+    const e = expiryInfo(p);
+    const state = p.state ? esc(p.state) : '—';
+    if (e.days == null) return `<div class="st-exp none">${state} · 保质期未标</div>`;
+    const tail = e.days <= 30 ? ` · ${e.text}` : '';
+    return `<div class="st-exp ${e.cls}">${state} · 最晚 ${e.date}${tail}</div>`;
+  }
+
+  function expirySummary(used = {}) {
+    const rows = pantryList()
+      .filter((p) => p.tracked && pantryExpireAt(p) && pantryShown(p, used) > 0)
+      .map((p) => ({ p, e: expiryInfo({ expireAt: pantryExpireAt(p) }) }))
+      .sort((a, b) => a.e.days - b.e.days);
+    const urgent = rows.filter((x) => x.e.days != null && x.e.days <= 3);
+    if (!urgent.length) return '';
+    return `<div class="expiry-alert"><b>优先吃</b>${urgent.slice(0, 3).map(({ p, e }) =>
+      `<span class="ea ${e.cls}">${esc(p.food)} <em>${esc(e.text)}</em></span>`).join('')}
+      ${urgent.length > 3 ? `<span class="ea more">+${urgent.length - 3}</span>` : ''}</div>`;
+  }
+
+  // Planned-but-not-bought rows, grouped by shopping trip.
+  function pendingParts() {
+    const out = [];
+    for (const p of pantryList()) {
+      if (!p.tracked) continue;
+      for (const part of pantryParts(p)) {
+        if (!partBought(part) && (Number(part.qty) || 0) > 0) out.push({ p, part });
+      }
+    }
+    return out.sort((a, b) => String(a.part.at || '').localeCompare(String(b.part.at || ''))
+      || String(a.part.src || '').localeCompare(String(b.part.src || '')));
+  }
+
+  function pendingBlock() {
+    const rows = pendingParts();
+    if (!rows.length) return '';
+    const groups = [];
+    for (const r of rows) {
+      let g = groups.find((x) => x.batch === r.part.src);
+      if (!g) groups.push(g = { batch: r.part.src, at: r.part.at, rows: [] });
+      g.rows.push(r);
+    }
+    return `<div class="pend">
+      <div class="pend-head"><b>还没买</b><span>不计入冰箱 · 买了点一下</span></div>
+      ${groups.map((g) => `<div class="pend-batch">
+        <div class="pend-bh"><span>${esc(g.batch)}</span><small>${g.at ? shortDate(g.at) + ' 买' : ''}</small>
+          <button class="pend-all" data-act="buy-all" data-batch="${esc(g.batch)}">全买了</button></div>
+        ${g.rows.map(({ p, part }) => `<div class="pend-row">
+          ${img('food', p.foodId, '', p.food)}
+          <div class="st-main"><div class="st-top"><b>${esc(p.food)}</b><span class="st-num">${fmtAmt(part.qty, part.unit)}</span></div>
+          <div class="st-sub">计划里要买 · 买了才算进冰箱</div></div>
+          <button class="pend-add" data-act="buy" data-batch="${esc(g.batch)}" data-food="${esc(part.food)}">买了</button>
+        </div>`).join('')}
+      </div>`).join('')}
+    </div>`;
+  }
+
   function renderFridge() {
     const used = pantryUsed();
     const items = pantryList();
-    const cats = ['肉', '蛋', '豆', '蔬菜', '菌菇', '主食', '干货', '坚果'];
-    let html = pageHead('冰箱', '照做一顿，这里自动扣');
+    const cats = ['肉', '蛋', '豆', '蔬菜', '菌菇', '主食', '干货', '坚果', '调味'];
+    let html = pageHead('冰箱', '只算买到的，照做自动扣') + expirySummary(used) + pendingBlock();
+    let shown = 0;
     for (const cat of cats) {
-      const list = items.filter((p) => p.cat === cat);
+      const list = items.filter((p) => p.cat === cat)
+        .filter((p) => !p.tracked || pantryShown(p, used) > 0)
+        .sort((a, b) => String(pantryExpireAt(a) || '9999').localeCompare(String(pantryExpireAt(b) || '9999')));
       if (!list.length) continue;
-      html += `<div class="sec"><h2>${cat}</h2><span>${list.length} 种</span></div><div class="stock">`;
+      const soon = list.filter((p) => {
+        const e = expiryInfo({ expireAt: pantryExpireAt(p) });
+        return e.days != null && e.days <= 7 && (!p.tracked || pantryShown(p, used) > 0);
+      }).length;
+      html += `<div class="sec"><h2>${cat}</h2><span>${list.length} 种${soon ? ` · ${soon} 种 7 天内到期` : ''}</span></div><div class="stock">`;
       for (const p of list) {
         if (!p.tracked) {
           html += `<div class="stock-row flat">${img('food', p.foodId, '', p.food)}
             <div class="st-main"><div class="st-top"><b>${esc(p.food)}</b><span class="st-num">常备</span></div>
-            <div class="st-sub">不计入扣减</div></div></div>`;
+            <div class="st-sub">不计入扣减</div>${expiryLine({ expireAt: pantryExpireAt(p), state: p.state })}</div></div>`;
           continue;
         }
-        const shown = pantryShown(p, used);
+        shown++;
+        const left = pantryShown(p, used);
+        const stock = pantryStock(p);
+        const waiting = pantryWaiting(p);
         const manual = state.data.pantry && state.data.pantry[p.foodId] != null;
-        const pct = p.base > 0 ? Math.max(0, Math.min(100, shown / p.base * 100)) : 0;
+        const pct = stock > 0 ? Math.max(0, Math.min(100, left / stock * 100)) : 0;
         html += `<button class="stock-row" data-act="pantry" data-id="${p.foodId}">
           ${img('food', p.foodId, '', p.food)}
           <div class="st-main">
-            <div class="st-top"><b>${esc(p.food)}</b><span class="st-num">${fmtAmt(shown, p.unit)}</span></div>
+            <div class="st-top"><b>${esc(p.food)}</b><span class="st-num">${fmtAmt(left, p.unit)}</span></div>
             <div class="bar"><i style="width:${pct}%"></i></div>
-            <div class="st-sub">初始 ${fmtAmt(p.base, p.unit)} · 已用 ${fmtAmt(used[p.foodId] || 0, p.unit)}${manual ? ' · 手动' : ''}</div>
+            <div class="st-sub">买到 ${fmtAmt(stock, p.unit)} · 已用 ${fmtAmt(used[p.foodId] || 0, p.unit)}${manual ? ' · 手动' : ''}${waiting > 0 ? ` · 没买 ${fmtAmt(waiting, p.unit)}` : ''}</div>
+            ${expiryLine({ expireAt: pantryExpireAt(p), state: p.state })}
           </div>
         </button>`;
       }
       html += `</div>`;
+    }
+    if (!shown && !pendingParts().length) {
+      html += `<div class="empty">冰箱是空的。<br>去「买菜」打勾，买回来的东西才会出现在这里。</div>`;
     }
     app.innerHTML = html;
     paintSync();
@@ -647,15 +893,30 @@
     const used = pantryUsed();
     const auto = pantryAuto(p, used);
     const manual = state.data.pantry ? state.data.pantry[p.foodId] : null;
+    const e = expiryInfo({ expireAt: pantryExpireAt(p) });
+    const parts = pantryParts(p);
+    const partRows = parts.map((q) => {
+      const bought = partBought(q);
+      const label = q.src === 'before' ? '家里原有' : `${esc(q.src)}${bought ? ' · 已买' : ' · 还没买'}`;
+      return `<div class="calc-row part${bought ? '' : ' wait'}"><span>${label}</span><b>${fmtAmt(q.qty, q.unit)}</b></div>`;
+    }).join('');
+    const wait = pantryWaiting(p);
     sheetEl.innerHTML = `<div class="hero" style="aspect-ratio:16/7">${img('food', p.foodId, '', p.food)}
       <button class="close" data-act="close">×</button>
       <div class="ht"><div class="s">赛博冰箱</div><h2>${esc(p.food)}</h2></div></div>
       <div class="sheet-body">
         <div class="calc">
-          <div class="calc-row"><span>初始</span><b>${fmtAmt(p.base, p.unit)}</b></div>
+          ${partRows || `<div class="calc-row"><span>初始</span><b>${fmtAmt(p.base, p.unit)}</b></div>`}
           <div class="calc-row"><span>照做已用</span><b>−${fmtAmt(used[p.foodId] || 0, p.unit)}</b></div>
           <div class="calc-row total"><span>自动计算</span><b>${fmtAmt(auto, p.unit)}</b></div>
+          <div class="calc-row"><span>存放</span><b>${esc(p.state || '—')}</b></div>
+          <div class="calc-row"><span>入库</span><b>${p.stockedAt ? shortDate(p.stockedAt) : '—'}</b></div>
+          <div class="calc-row"><span>保质期</span><b>${esc(p.shelfLife || '—')}</b></div>
+          <div class="calc-row"><span>最晚吃完</span><b class="exp-${e.cls}">${e.days == null ? '未标' : `${e.date} · ${esc(e.text)}`}</b></div>
         </div>
+        <div class="note-hint" style="margin:-8px 0 18px">${wait > 0
+          ? `「还没买」的 ${fmtAmt(wait, p.unit)} 不算库存，买了才加进来。`
+          : '按采购/入库日与保质期估算；开封后以包装为准。'}</div>
         <div class="block"><h3>手动校正</h3>
           <div class="edit-row">
             <input id="pantry-input" type="number" inputmode="decimal" min="0" step="1"
@@ -667,6 +928,71 @@
         </div>
         <button class="fb" style="width:100%;padding:13px" data-act="pantry-reset" data-id="${p.foodId}">恢复自动计算</button>
       </div>`;
+  }
+
+  /* ---------------- offline status ---------------- */
+
+  function offlineInfo() {
+    const info = state.prefetch || read('mw:prefetch', null);
+    const cached = read('mw:week', null);
+    const week = cached && cached.week ? cached.week : null;
+    const total = info && typeof info.total === 'number' ? info.total : 0;
+    const got = info && typeof info.cached === 'number' ? info.cached : 0;
+    const sameWeek = !!(info && week && info.week === week.id);
+    return { info, week, total, cached: got, sameWeek, ready: PACK || (sameWeek && got >= total) };
+  }
+
+  function offlineCard() {
+    const oi = offlineInfo();
+    const swReady = SW_READY();
+    const installed = INSTALLED();
+    const meta = PACK
+      ? `<div class="oc-meta">生成于 ${esc(String(OFFLINE.generatedAt || '').replace('T', ' ').slice(0, 16))}
+          · 同步地址 ${esc(PACK_BASE || '未设置')}</div>`
+      : `<div class="oc-grid">
+          <span class="oc-pill ${SECURE ? 'on' : 'off'}">HTTPS ${SECURE ? '✓' : '✗'}</span>
+          <span class="oc-pill ${swReady ? 'on' : 'off'}">离线缓存 ${swReady ? '✓' : '✗'}</span>
+          <span class="oc-pill ${installed ? 'on' : 'off'}">桌面 App ${installed ? '✓' : '✗'}</span>
+          <span class="oc-pill ${oi.ready ? 'on' : 'off'}">图片 ${oi.cached}/${oi.total}</span>
+        </div>`;
+    return `<div class="offline-card">
+      <div class="oc-head"><b>离线</b><span class="oc-badge ${oi.ready ? 'on' : ''}">${oi.ready ? '已就绪' : '待下载'}</span></div>
+      <p>${PACK
+        ? '这是下载到手机的离线包：菜单、步骤、图片都在文件里，关掉电脑、离开 WiFi 都能看。新的一周到了，在电脑上重新下载一次离线包。'
+        : '离开 WiFi 后，浏览器里的 192.168.x.x 地址打不开；要打开手机桌面上的图标，或下载下面的单文件离线包。'}</p>
+      ${meta}
+      <div class="oc-actions">
+        <button class="fb" data-act="sync">${PACK ? '同步反馈' : '立即同步'}</button>
+        ${PACK ? '' : '<a class="fb ghost" href="/offline.html" download>下载离线包</a>'}
+        ${PACK ? '' : '<a class="fb ghost" href="/setup">安装到手机</a>'}
+      </div>
+    </div>`;
+  }
+
+  function showNotice() {
+    const el = document.getElementById('notice');
+    if (!el || PACK || IS_FILE) return;
+    if (read('mw:noticeDismissed', false)) { el.hidden = true; return; }
+    const oi = offlineInfo();
+    const swReady = SW_READY();
+    const installed = INSTALLED();
+    const reasons = [];
+    if (!SECURE) {
+      reasons.push(location.protocol === 'https:'
+        ? '这个 HTTPS 证书手机还没信任，浏览器不会保存离线缓存。'
+        : '现在是用 HTTP 打开的：浏览器不会把离线缓存留在手机里。');
+    } else if (!swReady) reasons.push('离线缓存还没接管，刷新一次或重新打开桌面图标。');
+    else if (!installed && MOBILE) reasons.push('还没装到手机桌面，离开 WiFi 就会打不开。');
+    else if (!oi.ready) reasons.push('这一周的图片还没全部存到手机。');
+    if (!reasons.length) { el.hidden = true; return; }
+    const links = [];
+    if (!SECURE) links.push('<a href="/setup">用 HTTPS 安装</a>');
+    else if (!installed) links.push('<a href="/setup">看安装步骤</a>');
+    if (!oi.ready) links.push('<a href="/offline.html" download>下载离线包</a>');
+    el.innerHTML = `<div class="notice-tx">${reasons.map(esc).join('<br>')}
+      <div class="notice-links">${links.join('')}</div></div>
+      <button class="notice-x" data-act="dismiss-notice" aria-label="关闭">×</button>`;
+    el.hidden = false;
   }
 
   /* ---------------- week ---------------- */
@@ -693,7 +1019,8 @@
         <input id="wt" type="number" step="0.1" inputmode="decimal" value="${wt}" placeholder="98.9">
         <span class="unit">kg</span>
         <button class="fb small" data-act="weight">记下</button>
-      </div>`;
+      </div>
+      ${offlineCard()}`;
     paintSync();
   }
 
@@ -932,6 +1259,13 @@
 
     if (act === 'sync') { syncNow(); return; }
 
+    if (act === 'dismiss-notice') {
+      store('mw:noticeDismissed', true);
+      const n = document.getElementById('notice');
+      if (n) n.hidden = true;
+      return;
+    }
+
     if (act === 'tab') {
       state.tab = el.dataset.tab;
       history.replaceState(null, '', '#' + state.tab);
@@ -1019,6 +1353,38 @@
       return;
     }
 
+    if (act === 'buy') {
+      const batch = el.dataset.batch;
+      const food = el.dataset.food;
+      const key = batch + '|' + food;
+      if (!state.data.shopping[key]) {
+        state.data.shopping[key] = true;
+        saveData();
+        pushEvent({ type: 'shopping', batch, food, checked: true });
+      }
+      showToast(food + ' 已进冰箱');
+      render();
+      return;
+    }
+
+    if (act === 'buy-all') {
+      const batch = el.dataset.batch;
+      const b = state.week.shopping.find((x) => x.batch === batch);
+      let n = 0;
+      for (const it of (b ? b.items : [])) {
+        const key = batch + '|' + it.food;
+        if (!state.data.shopping[key]) {
+          state.data.shopping[key] = true;
+          pushEvent({ type: 'shopping', batch, food: it.food, checked: true });
+          n++;
+        }
+      }
+      saveData();
+      showToast(n ? `${batch} 都进冰箱了` : '这批已经买齐了');
+      render();
+      return;
+    }
+
     if (act === 'shop') {
       const key = el.dataset.key;
       const on = !state.data.shopping[key];
@@ -1084,7 +1450,97 @@
   }
 
   function showEmpty() {
-    app.innerHTML = `<div class="empty">还没有周计划。<br>在电脑上跑一次规划，把 week.json 放进 weeks/ 就行。</div>`;
+    app.innerHTML = `<div class="empty">
+      ${PACK ? '这个离线包里没有菜单数据。' : '还没有周计划，也没有本地缓存。'}<br>
+      ${PACK ? '请重新下载一次离线包。' : '连上电脑打开一次，或者下载单文件离线包。'}<br>
+      ${PACK ? '' : '<a class="fb" style="display:inline-block;margin-top:16px;padding:10px 18px;text-decoration:none" href="/offline.html" download>下载离线包</a>'}
+    </div>`;
+  }
+
+  async function boot() {
+    try {
+      // 1. Instant paint from the last good copy, or from the pack itself.
+      if (PACK) {
+        applyWeek(OFFLINE);
+        seedPackEvents(OFFLINE.events);
+        const snapshot = {
+          week: OFFLINE.week,
+          assets: OFFLINE.assets,
+          placeholder: OFFLINE.placeholder,
+          serverBase: OFFLINE.serverBase,
+          generatedAt: OFFLINE.generatedAt,
+        };
+        store('mw:week', snapshot);
+        state.online = false;
+      } else {
+        const cached = read('mw:week', null);
+        if (cached && cached.week) applyWeek(cached);
+      }
+      if (state.week) {
+        pickDay();
+        render();
+        applyHash();
+      }
+
+      // 2. Refresh from the PC.  fetchT keeps a dead LAN address to 6s.
+      if (!PACK) {
+        const before = state.week ? state.week.id : null;
+        await fetchWeek();
+        if (!state.week) { showEmpty(); showNotice(); return; }
+        if (!before || state.week.id !== before) {
+          pickDay();
+          if (!state.sheet && !state.pantryOpen) {
+            render();
+            applyHash();
+          }
+        } else {
+          paintSync();
+        }
+      } else if (!state.week) {
+        showEmpty();
+        showNotice();
+        return;
+      }
+
+      // 3. Feedback can arrive a moment later; never block the menu on it.
+      const hydrated = loadEvents().then(() => {
+        if (!state.sheet && !state.pantryOpen) render();
+        paintSync();
+      });
+      await Promise.race([hydrated, new Promise((r) => setTimeout(r, 2500))]);
+
+      loadCustomPhotos().then(() => {
+        if (!state.sheet && !state.pantryOpen) render();
+      });
+      window.addEventListener('popstate', onPop);
+      if (pendingCount()) flush();
+      setInterval(() => flush(), 20000);      window.addEventListener('online', () => flush());
+      document.addEventListener('visibilitychange', () => {
+        if (!document.hidden) { flush(); paintSync(); }
+      });
+      if (!PACK && navigator.storage && navigator.storage.persist) {
+        navigator.storage.persist().catch(() => {});
+      }
+      showNotice();
+
+      if (!PACK) {
+        setTimeout(() => {
+          if (!state.online) return;
+          prefetchAll().then(() => {
+            if (state.online) {
+              state.lastSync = new Date().toISOString();
+              store('mw:lastSync', state.lastSync);
+            }
+            paintSync();
+            if (state.tab === 'week' && !state.sheet && !state.pantryOpen) render();
+            showNotice();
+          });
+        }, 800);
+      }
+    } catch (e) {
+      const msg = e && e.message ? e.message : String(e);
+      app.innerHTML = `<div class="empty">启动失败：${esc(msg)}<br>下拉刷新试试。</div>`;
+    }
   }
 
   function applyHash() {
@@ -1154,41 +1610,6 @@
     const p = $('#pager');
     if (p) p.scrollLeft = state.day * p.clientWidth;
   });
-
-  /* ---------------- boot ---------------- */
-
-  async function boot() {
-    try {
-      await fetchWeek();
-      if (!state.week) { showEmpty(); return; }
-      await loadEvents();
-      await Promise.race([loadCustomPhotos(), new Promise((r) => setTimeout(r, 1500))]);
-      pickDay();
-      render();
-      renderTabs();
-      applyHash();
-      window.addEventListener('popstate', onPop);
-      if (state.queue.length) flush();
-      setInterval(() => flush(), 20000);
-      window.addEventListener('online', () => flush());
-      if (navigator.storage && navigator.storage.persist) navigator.storage.persist().catch(() => {});
-      setTimeout(() => {
-        if (!state.online) return;
-        prefetchAll().then(() => {
-          if (!state.online) return;
-          state.lastSync = new Date().toISOString();
-          store('mw:lastSync', state.lastSync);
-          paintSync();
-        });
-      }, 800);
-      if ('serviceWorker' in navigator && (location.protocol === 'https:' || /^(localhost|127\.0\.0\.1)$/.test(location.hostname))) {
-        navigator.serviceWorker.register('/sw.js').catch(() => {});
-      }
-    } catch (e) {
-      const msg = e && e.message ? e.message : String(e);
-      app.innerHTML = `<div class="empty">启动失败：${esc(msg)}<br>下拉刷新试试。</div>`;
-    }
-  }
 
   boot();
 })();

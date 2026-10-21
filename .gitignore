@@ -10,6 +10,9 @@ certs/*.crt
 certs/*.key
 certs/*.pfx
 docs/*.png
+logs/
+dist/
+.dsh-*
 
 # os
 .DS_Store
@@ -22,3 +25,4 @@ assets/food/
 assets/dish/
 assets/credits.json
 week-*.json
+

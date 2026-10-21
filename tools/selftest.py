@@ -3,7 +3,7 @@
 
     python tools/selftest.py
 """
-import json, os, sys, urllib.request
+import json, os, re, sys, urllib.request
 from collections import Counter
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -22,7 +22,8 @@ def main():
     check(bool(ids), "weeks/ 下至少有一个周目录")
     if not ids:
         return report()
-    wid = ids[-1]
+    dated = [d for d in ids if re.match(r"^\d{4}-W\d{2}$", d)]
+    wid = (dated or ids)[-1]
     wdir = os.path.join(WEEKS, wid)
     week = json.load(open(os.path.join(wdir, "week.json"), encoding="utf-8"))
     dishes = json.load(open(os.path.join(ROOT, "library", "dishes.json"), encoding="utf-8"))
@@ -62,6 +63,24 @@ def main():
         for it in b["items"]:
             check(bool(it.get("foodId")), "采购项 %s 有 foodId" % it.get("food"))
 
+    for p in week.get("pantry") or []:
+        check(bool(p.get("foodId")), "库存 %s 有 foodId" % p.get("food"))
+        if p.get("tracked"):
+            check(bool(p.get("state")), "库存 %s 有存放方式" % p.get("food"), soft=True)
+            check(bool(p.get("expireAt")), "库存 %s 有最晚吃完日期" % p.get("food"), soft=True)
+        parts = p.get("parts") or []
+        if parts:
+            check(abs(sum(q.get("qty") or 0 for q in parts) - (p.get("base") or 0)) < 0.01,
+                  "库存 %s 分批合计 = 初始 %s" % (p.get("food"), p.get("base")))
+    batches = {b.get("batch"): {it.get("food") for it in b.get("items") or []}
+               for b in week.get("shopping") or []}
+    for p in week.get("pantry") or []:
+        for q in p.get("parts") or []:
+            if q.get("src") == "before":
+                continue
+            check(q.get("src") in batches and q.get("food") in batches[q["src"]],
+                  "库存 %s 的 %s 能对回采购清单" % (p.get("food"), q.get("src")))
+
     ev = os.path.join(wdir, "events.jsonl")
     if os.path.exists(ev):
         n = 0
@@ -86,6 +105,17 @@ def main():
     check(not missing_dish, "缺少菜图：%s" % (missing_dish or "无"))
     check(not missing_food, "缺少食材图：%s" % (missing_food or "无"), soft=True)
 
+    # Windows PowerShell 5.1 reads a .ps1 without a BOM as ANSI; the Chinese
+    # strings then break the parser and start-https.bat quietly starts nothing.
+    for name in ("start.ps1", "stop-server.ps1", os.path.join("certs", "make-certs.ps1")):
+        p = os.path.join(ROOT, name)
+        if not os.path.exists(p):
+            continue
+        raw = open(p, "rb").read()
+        if any(b > 127 for b in raw):
+            check(raw.startswith(b"\xef\xbb\xbf"),
+                  "%s 带 UTF-8 BOM（否则 PowerShell 5.1 解析失败）" % name.replace("\\", "/"))
+
     # http
     try:
         with urllib.request.urlopen("http://127.0.0.1:8765/api/health", timeout=3) as r:
@@ -96,6 +126,13 @@ def main():
             real = [d for d in dish_ids if d not in no_photo]
             check(sorted(payload.get("assets", {}).get("dish", {})) == sorted(real),
                   "菜图清单 %d 项（无照片的 %d 道走品类卡）" % (len(real), len(dish_ids) - len(real)))
+        with urllib.request.urlopen("http://127.0.0.1:8765/offline.html", timeout=30) as r:
+            pack = r.read()
+            check(r.status == 200, "/offline.html 可下载")
+            check(b"window.MW_OFFLINE" in pack and wid.encode() in pack,
+                  "离线包含本周数据")
+            check(b"data:image/webp;base64," in pack,
+                  "离线包内嵌图片（%.1f MB）" % (len(pack) / 1048576.0))
     except Exception as e:
         warn.append("服务未运行（跳过 HTTP 检查）：%s" % str(e)[:60])
 

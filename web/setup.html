@@ -5,12 +5,15 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
 <title>装到手机上</title>
 <style>
-  :root { --bg:#fbf7f0; --card:#fffdf9; --ink:#241f1a; --sub:#6f6355; --line:#ece2d2; --accent:#c2452c; }
+  :root { --bg:#fbf7f0; --card:#fffdf9; --ink:#241f1a; --sub:#6f6355; --line:#ece2d2; --accent:#c2452c; --green:#5f7a4c; }
   * { box-sizing: border-box; }
   body { margin:0; background:var(--bg); color:var(--ink); font:16px/1.6 -apple-system,"PingFang SC","Microsoft YaHei",system-ui,sans-serif; }
-  .wrap { max-width:520px; margin:0 auto; padding:28px 20px 60px; }
+  .wrap { max-width:560px; margin:0 auto; padding:28px 20px 64px; }
   h1 { font-size:24px; margin:0 0 6px; }
-  .lead { color:var(--sub); font-size:14px; margin-bottom:26px; }
+  .lead { color:var(--sub); font-size:14px; margin-bottom:8px; }
+  .lead b { color:var(--accent); }
+  .now { margin:14px 0 24px; padding:10px 13px; border-radius:12px; background:#f2e9db; color:var(--sub); font-size:12.5px; line-height:1.55; }
+  .now code { background:#fffdf9; }
   .step { display:flex; gap:14px; margin-bottom:22px; }
   .n { flex:none; width:28px; height:28px; border-radius:50%; background:var(--accent); color:#fff; display:grid; place-items:center; font-size:13px; font-weight:600; }
   .body { flex:1; }
@@ -20,17 +23,30 @@
   .btn.ghost { background:var(--card); color:var(--ink); border:1px solid var(--line); }
   code { background:#f2e9db; padding:1px 6px; border-radius:5px; font-size:13px; }
   .note { background:#fdf6e8; border-left:3px solid #dfb35f; padding:10px 13px; border-radius:0 8px 8px 0; font-size:13px; color:#6b5636; margin-top:26px; }
+  .check { margin-top:26px; padding:14px 16px; background:var(--card); border:1px solid var(--line); border-radius:14px; }
+  .check h2 { font-size:15px; margin:0 0 8px; }
+  .check ol { margin:0; padding-left:20px; color:var(--sub); font-size:13px; line-height:1.8; }
+  .tag { display:inline-block; font-size:11px; padding:2px 8px; border-radius:99px; background:#e6eddd; color:var(--green); margin-left:6px; vertical-align:1px; }
+  .alt { margin-top:26px; padding-top:22px; border-top:1px dashed #d8c9b2; }
+  .alt h2 { font-size:18px; margin:0 0 6px; }
+  .alt p { color:var(--sub); font-size:13.5px; margin:0 0 4px; }
+  .warn { color:#a0522d; }
 </style>
 </head>
 <body>
 <div class="wrap">
   <h1>装到手机上</h1>
-  <p class="lead">做完这三步，手机上就是独立 app，断网、离开电脑都能用；回到同一个 wifi 才同步。</p>
+  <p class="lead">关掉电脑后，手机浏览器里的 <code>192.168.x.x</code> 地址<b>一定打不开</b>；离开这个 WiFi 也一样。要让手机在没电脑、没 WiFi 时还能看，只有两条路：<b>装成桌面 App</b>，或<b>下载单文件离线包</b>。</p>
+
+  <div class="now">
+    当前地址：<code id="here">…</code><br>
+    <span id="secure-line">正在检查 HTTPS…</span>
+  </div>
 
   <div class="step">
     <div class="n">1</div>
     <div class="body">
-      <b>下载证书</b>
+      <b>下载证书 <span style="font-weight:400;color:#9c8f7e">（装桌面 App 才需要）</span></b>
       <p>这是这台电脑自己签的根证书，只用来让手机信任局域网地址。</p>
       <a class="btn" href="/ca.crt" download="rootCA.crt">下载 rootCA.crt</a>
     </div>
@@ -41,29 +57,58 @@
     <div class="body">
       <b>安装为 CA 证书</b>
       <p>设置 → 安全 → 加密与凭据 → 安装证书 → <code>CA 证书</code> → 选择刚下载的文件。<br>
-      不同品牌路径略有差异，找「安装证书 / 凭据」即可。装完重启一次 Chrome。</p>
+      不同品牌路径略有差异，找「安装证书 / 凭据」即可。装完重启一次 Chrome。<br>
+      <span class="warn">iPhone：设置 → 通用 → VPN 与设备管理 → 安装描述文件；再到 通用 → 关于本机 → 证书信任设置，打开完全信任。</span></p>
     </div>
   </div>
 
   <div class="step">
     <div class="n">3</div>
     <div class="body">
-      <b>打开并添加到主屏幕</b>
-      <p>用 Chrome 打开下面这个地址，右上角菜单 →「添加到主屏幕」。</p>
-      <a class="btn ghost" id="app" href="#">打开 app</a>
+      <b>用 HTTPS 打开并添加到主屏幕</b>
+      <p>Chrome / Edge：右上角菜单 →「安装应用 / 添加到主屏幕」。<br>
+      iPhone Safari：分享 →「添加到主屏幕」。</p>
+      <a class="btn ghost" id="app" href="#">打开 HTTPS 地址</a>
     </div>
   </div>
 
+  <div class="alt">
+    <h2>不想装证书：下载离线包 <span class="tag">推荐</span></h2>
+    <p>一个 HTML 文件，里面已经有这一周的菜单、步骤和全部图片。下载一次，之后关掉电脑、离开 WiFi、开飞行模式都能打开；回到同一个 WiFi 再点「同步反馈」。</p>
+    <a class="btn" id="offline" href="/offline.html" download="mealweek.html">下载离线包（约 4 MB）</a>
+    <p style="margin-top:8px;font-size:12px;color:#9c8f7e">存在「下载 / Downloads」里。用 Chrome 打开这个文件；iPhone 的「文件」预览不执行脚本，所以 iPhone 请走上面的 HTTPS 安装。</p>
+  </div>
+
+  <div class="check">
+    <h2>怎么确认真的离线可用</h2>
+    <ol>
+      <li>手机开飞行模式（或关掉 WiFi）。</li>
+      <li>点桌面上的「本周菜单」图标，或从下载里打开离线包。</li>
+      <li>能看到这周的菜、步骤和图片，就是真的离线可用。</li>
+      <li>如果只看到浏览器错误页，说明你打开的还是 <code>http(s)://192.168.x.x</code> 网址，不是 App / 离线包。</li>
+    </ol>
+  </div>
+
   <div class="note">
-    装好后第一次打开会自己把这一周的菜单和图片缓存下来（进度在顶部「同步」里）。之后没网也能看、能勾选；回到 wifi 点一下「同步」就把新一周和勾选传回去。
+    装好 App 后第一次打开，等顶部「同步」变成「已同步」，并且「本周 → 离线」显示「已就绪」，图片才全部存到了手机。之后每周回到 WiFi 点一次同步。<br>
+    证书绑 IP：路由器里给电脑做 DHCP 保留；IP 变了重跑一次 <code>make-certs.ps1</code> 并重装证书，或者直接用离线包。
   </div>
 </div>
 <script>
   var host = location.hostname;
-  var url = 'https://' + host + ':8443/';
-  var a = document.getElementById('app');
-  a.href = url;
-  a.textContent = url;
+  var httpsUrl = 'https://' + host + ':8443/';
+  var app = document.getElementById('app');
+  app.href = httpsUrl;
+  app.textContent = httpsUrl;
+  document.getElementById('here').textContent = location.href;
+  var line = document.getElementById('secure-line');
+  if (window.isSecureContext) {
+    line.textContent = '当前 HTTPS 证书已被信任：直接点第 3 步安装，装完就是真离线。';
+  } else if (location.protocol === 'https:') {
+    line.textContent = '这个 HTTPS 证书手机还没信任：离线缓存会被浏览器禁用。按第 1、2 步装好证书，或用下面的离线包。';
+  } else {
+    line.textContent = '当前是 HTTP，浏览器不会保存离线缓存；请按第 3 步用 HTTPS 打开，或直接下载下面的离线包。';
+  }
 </script>
 </body>
 </html>

@@ -1,7 +1,9 @@
 {
+  "id": "/",
   "name": "本周菜单",
   "short_name": "菜单",
   "description": "一人一锅的每周备餐卡",
+  "lang": "zh-CN",
   "start_url": "/",
   "scope": "/",
   "display": "standalone",
