@@ -423,6 +423,7 @@
   const ART = {
     '炒': ['chao', '炒'], '汤面': ['tangmian', '面'], '汤': ['tang', '汤'],
     '炖': ['dun', '炖'], '烧': ['shao', '烧'], '煎': ['jian', '饼'],
+    '牛排': ['jian', '排'],
   };
 
   function dishArt(method) {
