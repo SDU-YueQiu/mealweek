@@ -210,6 +210,11 @@ img { display: block; max-width: 100%; }
 .tonight-row .tx { font-size: 14px; color: var(--ink); }
 .tonight-row .tx small { display: block; color: var(--sub); font-size: 12px; margin-top: 2px; }
 .tonight-row.done .tx { text-decoration: line-through; opacity: .55; }
+.tonight-row .late {
+  font-style: normal; font-size: 10px; color: var(--amber);
+  border: 1px solid #e8d3a8; border-radius: 5px;
+  padding: 0 4px; margin-right: 6px; vertical-align: 1px;
+}
 
 /* ---------- tabs ---------- */
 .tabs {
@@ -690,6 +695,16 @@ ol.steps li .tbtn {
 .st-exp.soon { color: var(--amber); font-weight: 600; }
 .st-exp.expired { color: var(--accent); font-weight: 600; }
 .st-exp.none { color: var(--faint); }
+
+/* 已吃完：按用完的日期排在最后，默认折起来 */
+.gone { margin: 26px 0 8px; border-top: 1px dashed var(--line); padding-top: 10px; }
+.gone summary { cursor: pointer; list-style: none; font-size: 12px; color: var(--faint); letter-spacing: .04em; }
+.gone summary::-webkit-details-marker { display: none; }
+.gone summary::before { content: '▸'; display: inline-block; width: 14px; }
+.gone[open] summary::before { content: '▾'; }
+.gone-list { margin-top: 8px; display: flex; flex-direction: column; gap: 7px; }
+.gone-row { display: flex; justify-content: space-between; gap: 12px; font-size: 12px; color: var(--sub); padding: 0 2px; }
+.gone-row small { color: var(--faint); font-variant-numeric: tabular-nums; }
 
 .calc-row.part.wait span, .calc-row.part.wait b { color: var(--amber); }
 

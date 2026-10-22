@@ -49,7 +49,18 @@
 
   const esc = (s) => String(s == null ? '' : s).replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
   const iso = (d) => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
-  const todayIso = () => iso(new Date());
+  // 凌晨 4 点前还算「前一天」：十二点后做饭、解冻都还是这一晚的事。
+  const DAY_CUTOFF = 4;
+  const todayIso = () => {
+    const d = new Date();
+    if (d.getHours() < DAY_CUTOFF) d.setDate(d.getDate() - 1);
+    return iso(d);
+  };
+  const shiftIso = (s, n) => {
+    const d = new Date(s + 'T12:00:00');
+    d.setDate(d.getDate() + n);
+    return iso(d);
+  };
   const uid = () => (crypto.randomUUID ? crypto.randomUUID() : `${Date.now()}-${Math.random().toString(16).slice(2)}`);
 
   function md(isoStr) {
@@ -612,18 +623,22 @@
 
   function tonightBlock() {
     const today = todayIso();
+    const prev = shiftIso(today, -1);
     const evs = (state.week.events || []).filter((e) => (e.at || '').slice(0, 10) === today);
-    if (!evs.length) return '';
-    const rows = evs.map((e) => {
+    // 昨晚没做完的事今天还留着，别因为过了零点就消失。
+    const carried = (state.week.events || [])
+      .filter((e) => (e.at || '').slice(0, 10) === prev && !state.data.thaw[e.at]);
+    if (!evs.length && !carried.length) return '';
+    const row = (e, late) => {
       const done = !!state.data.thaw[e.at];
       const label = { thaw: '解冻', split: '分装', open: '开封', finish: '吃完' }[e.type] || e.type;
       return `<div class="tonight-row ${done ? 'done' : ''}" data-act="thaw" data-at="${esc(e.at)}">
         <span class="ck ${done ? 'on' : ''}">✓</span>
-        <div class="tx">${label} ${esc(e.food)} ${e.qty ? `<b>${e.qty}${esc(e.unit || '')}</b>` : ''}
+        <div class="tx">${late ? '<i class="late">昨天</i>' : ''}${label} ${esc(e.food)} ${e.qty ? `<b>${e.qty}${esc(e.unit || '')}</b>` : ''}
           <small>${esc(e.note || '')}</small></div>
       </div>`;
-    }).join('');
-    return `<section class="tonight"><h4>今晚要做的</h4>${rows}</section>`;
+    };
+    return `<section class="tonight"><h4>今晚要做的</h4>${evs.map((e) => row(e, false)).join('')}${carried.map((e) => row(e, true)).join('')}</section>`;
   }
 
   function moodBlock(d) {
@@ -812,6 +827,31 @@
       ${urgent.length > 3 ? `<span class="ea more">+${urgent.length - 3}</span>` : ''}</div>`;
   }
 
+  // The day each item ran out, by replaying the eaten meals in date order.
+  function pantryFinished() {
+    const stock = {};
+    for (const p of pantryList()) if (p.tracked) stock[p.foodId] = pantryStock(p);
+    const acc = {};
+    const out = {};
+    const days = state.week.days.slice().sort((a, b) => a.date.localeCompare(b.date));
+    for (const d of days) {
+      for (const m of d.meals) {
+        const rec = state.data.meals[d.date + '|' + m.slot] || {};
+        if (rec.status !== 'eaten') continue;
+        for (const it of m.items || []) {
+          const fid = it.foodId;
+          if (!stock[fid]) continue;
+          const p = pantryList().find((x) => x.foodId === fid);
+          if (p && p.unit === '个' && it.unit !== '个') continue;
+          if (p && p.unit === 'g' && it.unit !== 'g' && it.unit !== 'ml') continue;
+          acc[fid] = (acc[fid] || 0) + (it.qty || 0);
+          if (!out[fid] && acc[fid] >= stock[fid] - 0.01) out[fid] = d.date;
+        }
+      }
+    }
+    return out;
+  }
+
   function renderFridge() {
     const used = pantryUsed();
     const items = pantryList();
@@ -854,6 +894,16 @@
     }
     if (!shown) {
       html += `<div class="empty">冰箱是空的。<br>买的菜在「买菜」打勾后才会进来。</div>`;
+    }
+    const finished = pantryFinished();
+    const gone = items.filter((p) => p.tracked && pantryShown(p, used) <= 0)
+      .sort((a, b) => String(finished[b.foodId] || '').localeCompare(String(finished[a.foodId] || '')));
+    if (gone.length) {
+      html += `<details class="gone"><summary>已吃完 ${gone.length} 种</summary>
+        <div class="gone-list">${gone.map((p) => `
+          <div class="gone-row"><span>${esc(p.food)}</span>
+            <small>${finished[p.foodId] ? shortDate(finished[p.foodId]) + ' 用完' : '手动清零'}</small></div>`).join('')}
+        </div></details>`;
     }
     app.innerHTML = html;
     paintSync();
