@@ -215,6 +215,10 @@ img { display: block; max-width: 100%; }
   border: 1px solid #e8d3a8; border-radius: 5px;
   padding: 0 4px; margin-right: 6px; vertical-align: 1px;
 }
+.tonight-row.note { padding: 4px 0 8px; border-bottom: 1px dashed var(--line); margin-bottom: 4px; }
+.tonight-row.note .ic { color: var(--amber); }
+.tonight-row.note .tx { color: var(--amber); font-weight: 600; }
+.tonight-row.note .tx small { font-weight: 400; color: var(--sub); }
 
 /* ---------- tabs ---------- */
 .tabs {

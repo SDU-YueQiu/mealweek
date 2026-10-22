@@ -629,7 +629,9 @@
     // 昨晚没做完的事今天还留着，别因为过了零点就消失。
     const carried = (state.week.events || [])
       .filter((e) => (e.at || '').slice(0, 10) === prev && !state.data.thaw[e.at]);
-    if (!evs.length && !carried.length) return '';
+    // 周五固定提醒：先排下周前三天，周六才能一早去买菜。
+    const isFriday = new Date(today + 'T12:00:00').getDay() === 5;
+    if (!evs.length && !carried.length && !isFriday) return '';
     const row = (e, late) => {
       const done = !!state.data.thaw[e.at];
       const label = { thaw: '解冻', split: '分装', open: '开封', finish: '吃完' }[e.type] || e.type;
@@ -639,7 +641,12 @@
           <small>${esc(e.note || '')}</small></div>
       </div>`;
     };
-    return `<section class="tonight"><h4>今晚要做的</h4>${evs.map((e) => row(e, false)).join('')}${carried.map((e) => row(e, true)).join('')}</section>`;
+    const weekly = isFriday
+      ? `<div class="tonight-row note"><span class="ic">◷</span>
+          <div class="tx">排下周前几天的菜单<small>先把下周一–周三一餐一餐定下来（每餐至少 3 个选项），周六早上就能照单买菜。</small></div>
+        </div>`
+      : '';
+    return `<section class="tonight"><h4>今晚要做的</h4>${weekly}${evs.map((e) => row(e, false)).join('')}${carried.map((e) => row(e, true)).join('')}</section>`;
   }
 
   function moodBlock(d) {
