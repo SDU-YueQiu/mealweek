@@ -2048,13 +2048,20 @@
           "foodId": "suan"
         },
         {
-          "food": "干辣椒、花椒",
-          "qty": 1,
-          "unit": "小包",
-          "note": "各 1 小包",
-          "use": "周一、周二、周五",
+          "food": "干辣椒",
+          "qty": 30,
+          "unit": "g",
+          "note": "约 1 小包",
           "shelfLife": "1 年",
           "foodId": "ganlajiao"
+        },
+        {
+          "food": "花椒",
+          "qty": 20,
+          "unit": "g",
+          "note": "约 1 小包",
+          "shelfLife": "1 年",
+          "foodId": "huajiao"
         }
       ]
     },
@@ -2328,18 +2335,36 @@
     },
     {
       "foodId": "ganlajiao",
-      "food": "干辣椒、花椒",
-      "unit": "小包",
-      "base": 1.0,
-      "tracked": false,
-      "cat": "调味"
+      "food": "干辣椒",
+      "unit": "g",
+      "base": 30.0,
+      "tracked": true,
+      "cat": "调味",
+      "state": "常温",
+      "expireAt": "2027-10-18",
+      "shelfLifeDays": 365,
+      "shelfLife": "1 年",
+      "stockedAt": "2026-10-18"
+    },
+    {
+      "foodId": "huajiao",
+      "food": "花椒",
+      "unit": "g",
+      "base": 20.0,
+      "tracked": true,
+      "cat": "调味",
+      "state": "常温",
+      "expireAt": "2027-10-18",
+      "shelfLifeDays": 365,
+      "shelfLife": "1 年",
+      "stockedAt": "2026-10-18"
     },
     {
       "foodId": "jiang",
       "food": "姜",
       "unit": "g",
       "base": 100.0,
-      "tracked": false,
+      "tracked": true,
       "cat": "调味",
       "state": "冷藏",
       "expireAt": "2026-11-08",
@@ -2352,7 +2377,7 @@
       "food": "小葱",
       "unit": "g",
       "base": 50.0,
-      "tracked": false,
+      "tracked": true,
       "cat": "调味",
       "state": "冷藏",
       "expireAt": "2026-10-25",
@@ -2365,7 +2390,7 @@
       "food": "蒜",
       "unit": "g",
       "base": 50.0,
-      "tracked": false,
+      "tracked": true,
       "cat": "调味",
       "state": "常温",
       "expireAt": "2026-12-17",
@@ -2378,7 +2403,7 @@
       "food": "郫县豆瓣酱",
       "unit": "g",
       "base": 200.0,
-      "tracked": false,
+      "tracked": true,
       "cat": "调味"
     }
   ]

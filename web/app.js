@@ -749,6 +749,21 @@
     return dates.sort()[0];
   }
 
+  // 调味按克进货，做菜按 片/瓣/根/个 写，换算一下才能扣库存。
+  const UNIT_GRAMS = {
+    jiang: { '片': 3 }, suan: { '瓣': 5 }, xiaocong: { '根': 5 }, ganlajiao: { '个': 1.5 },
+  };
+
+  function itemGrams(p, it) {
+    const q = Number(it.qty) || 0;
+    if (!q) return 0;
+    if (it.unit === p.unit) return q;
+    if (p.unit === 'g' && (it.unit === 'g' || it.unit === 'ml')) return q;
+    const map = UNIT_GRAMS[p.foodId];
+    if (p.unit === 'g' && map && map[it.unit]) return q * map[it.unit];
+    return 0;
+  }
+
   function pantryUsed() {
     const used = {};
     for (const d of state.week.days) {
@@ -758,9 +773,7 @@
         for (const it of m.items || []) {
           const p = pantryList().find((x) => x.foodId === it.foodId);
           if (!p || !p.tracked) continue;
-          let amt = 0;
-          if (p.unit === 'g' && (it.unit === 'g' || it.unit === 'ml')) amt = it.qty || 0;
-          else if (p.unit === '个' && it.unit === '个') amt = it.qty || 0;
+          const amt = itemGrams(p, it);
           if (amt) used[p.foodId] = (used[p.foodId] || 0) + amt;
         }
       }
@@ -850,9 +863,9 @@
           const fid = it.foodId;
           if (!stock[fid]) continue;
           const p = pantryList().find((x) => x.foodId === fid);
-          if (p && p.unit === '个' && it.unit !== '个') continue;
-          if (p && p.unit === 'g' && it.unit !== 'g' && it.unit !== 'ml') continue;
-          acc[fid] = (acc[fid] || 0) + (it.qty || 0);
+          const amt = itemGrams(p, it);
+          if (!amt) continue;
+          acc[fid] = (acc[fid] || 0) + amt;
           if (!out[fid] && acc[fid] >= stock[fid] - 0.01) out[fid] = d.date;
         }
       }

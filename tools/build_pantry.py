@@ -193,8 +193,6 @@ def main():
     for rec in items.values():
         if rec["base"] <= 0 and rec["tracked"]:
             rec["tracked"] = False
-        if rec["cat"] == "调味":
-            rec["tracked"] = False
 
         exps = rec.pop("_expiry")
         states = rec.pop("_states")
