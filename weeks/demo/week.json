@@ -2021,13 +2021,31 @@
           "foodId": "mianfen"
         },
         {
-          "food": "姜、蒜、小葱",
+          "food": "小葱",
           "qty": 1,
-          "unit": "份",
-          "note": "各 1 份",
+          "unit": "把",
+          "note": "约 50 g",
           "use": "全周",
-          "shelfLife": "2 周",
+          "expireAt": "2026-10-25",
+          "foodId": "xiaocong"
+        },
+        {
+          "food": "姜",
+          "qty": 1,
+          "unit": "块",
+          "note": "约 100 g",
+          "use": "全周",
+          "expireAt": "2026-11-08",
           "foodId": "jiang"
+        },
+        {
+          "food": "蒜",
+          "qty": 1,
+          "unit": "头",
+          "note": "约 50 g",
+          "use": "全周",
+          "expireAt": "2026-12-17",
+          "foodId": "suan"
         },
         {
           "food": "干辣椒、花椒",
@@ -2309,20 +2327,51 @@
       "cat": "坚果"
     },
     {
-      "foodId": "jiang",
-      "food": "姜、蒜、小葱",
-      "unit": "份",
-      "base": 1.0,
-      "tracked": false,
-      "cat": "调味"
-    },
-    {
       "foodId": "ganlajiao",
       "food": "干辣椒、花椒",
       "unit": "小包",
       "base": 1.0,
       "tracked": false,
       "cat": "调味"
+    },
+    {
+      "foodId": "jiang",
+      "food": "姜",
+      "unit": "g",
+      "base": 100.0,
+      "tracked": false,
+      "cat": "调味",
+      "state": "冷藏",
+      "expireAt": "2026-11-08",
+      "shelfLifeDays": 21,
+      "shelfLife": "3 周",
+      "stockedAt": "2026-10-18"
+    },
+    {
+      "foodId": "xiaocong",
+      "food": "小葱",
+      "unit": "g",
+      "base": 50.0,
+      "tracked": false,
+      "cat": "调味",
+      "state": "冷藏",
+      "expireAt": "2026-10-25",
+      "shelfLifeDays": 7,
+      "shelfLife": "1 周",
+      "stockedAt": "2026-10-18"
+    },
+    {
+      "foodId": "suan",
+      "food": "蒜",
+      "unit": "g",
+      "base": 50.0,
+      "tracked": false,
+      "cat": "调味",
+      "state": "常温",
+      "expireAt": "2026-12-17",
+      "shelfLifeDays": 60,
+      "shelfLife": "2 个月",
+      "stockedAt": "2026-10-18"
     },
     {
       "foodId": "doubanjiang",
