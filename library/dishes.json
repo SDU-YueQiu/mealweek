@@ -195,5 +195,50 @@
       "孜然"
     ],
     "method": "炒"
+  },
+  "liji-tangmian": {
+    "name": "里脊汤面",
+    "tags": [
+      "猪里脊",
+      "快",
+      "清冰箱"
+    ],
+    "method": "汤面"
+  },
+  "liji-chaofan": {
+    "name": "里脊肉丝炒饭",
+    "tags": [
+      "猪里脊",
+      "快",
+      "清冰箱"
+    ],
+    "method": "炒"
+  },
+  "niurou-chaofan": {
+    "name": "牛肉炒饭",
+    "tags": [
+      "猪里脊",
+      "快",
+      "清冰箱"
+    ],
+    "method": "炒"
+  },
+  "jian-liji": {
+    "name": "煎里脊配饭",
+    "tags": [
+      "猪里脊",
+      "快",
+      "清冰箱"
+    ],
+    "method": "煎"
+  },
+  "liji-huadan": {
+    "name": "里脊滑蛋饭",
+    "tags": [
+      "猪里脊",
+      "快",
+      "清冰箱"
+    ],
+    "method": "炒"
   }
 }
