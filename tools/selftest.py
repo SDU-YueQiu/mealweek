@@ -98,11 +98,13 @@ def main():
     except Exception:
         credits = {}
     no_photo = {k for k, v in credits.items() if (v or {}).get("source") in ("composite", "none", "placeholder")}
+    # 每道菜都必须有真图：文件在，而且 credits 里标的是 commons/web。
     missing_dish = [d for d in dish_ids
-                    if d not in no_photo and not os.path.exists(os.path.join(ASSETS, "dish", d + ".webp"))]
+                    if not os.path.exists(os.path.join(ASSETS, "dish", d + ".webp"))
+                    or (credits.get(d) or {}).get("source") not in ("commons", "web")]
     missing_food = [f for f in food_ids
                     if f not in no_photo and not os.path.exists(os.path.join(ASSETS, "food", f + ".webp"))]
-    check(not missing_dish, "缺少菜图：%s" % (missing_dish or "无"))
+    check(not missing_dish, "每道菜都有真图：%s" % (missing_dish or "无"))
     check(not missing_food, "缺少食材图：%s" % (missing_food or "无"), soft=True)
 
     # Windows PowerShell 5.1 reads a .ps1 without a BOM as ANSI; the Chinese

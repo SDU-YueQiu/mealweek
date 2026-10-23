@@ -64,6 +64,7 @@ python server.py 8765
 12. 冰箱 0 g 的菜收进底部「已吃完 N 种」折叠列，按用完的日期排。
 13. 每天可以单独设配额（`days[].target`），暴食后减量、聚餐前加量都不用动整周。
 14. 排菜前先看 `weeks/<id>/events.jsonl` 的最新反馈：谁被跳过、谁「不好吃」、洋葱坏了这种，都要反映到下一版菜单里。
+15. **每道菜都必须有真图**，不许拿品类卡凑数：新增菜先找成品图（Wikimedia Commons 或 360 图搜），裁成 1280×720 WebP 存到 `assets/dish/<dishId>.webp`，`assets/credits.json` 里标 `{"source": "web"}`。图片不进 git（`.gitignore`），换机器要重新跑 `tools/fetch_images.py` 或用 360 补。`tools/selftest.py` 会把「没图 / 用占位图」的菜直接判失败。
 
 ## 手机安装（HTTPS）
 
