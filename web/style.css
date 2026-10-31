@@ -276,6 +276,9 @@ img { display: block; max-width: 100%; }
   border-radius: 999px; padding: 3px 10px;
 }
 .t-macros { margin: 14px 0 18px; grid-template-columns: repeat(3, 1fr); }
+.rest { padding: 96px 20px; text-align: center; }
+.rest-big { font-size: 26px; letter-spacing: .06em; color: var(--ink); }
+.rest-sub { margin-top: 10px; font-size: 12.5px; color: var(--faint); }
 .tr-list { margin: 0; padding-left: 16px; font-size: 13px; color: var(--ink); line-height: 1.6; }
 .tr-table { border: 1px solid var(--line); border-radius: 14px; background: #fff; padding: 0 14px; }
 .tr-row {

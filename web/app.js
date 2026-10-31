@@ -601,11 +601,11 @@
         const w = p.clientWidth || 1;
         const i = Math.round(p.scrollLeft / w);
         if (state.tab === 'train') {
-          const sess = trainSessions();
-          if (i !== state.tsess && i >= 0 && i < sess.length) {
+          const pages = trainPages();
+          if (i !== state.tsess && i >= 0 && i < pages.length) {
             state.tsess = i;
             const top = $('#top');
-            if (top) top.outerHTML = tHeader(sess, i);
+            if (top) top.outerHTML = tHeader(pages, i);
             paintSync();
           }
           return;
@@ -699,7 +699,7 @@
     const s = sessionOn(d.date);
     if (!s) return '';
     const today = d.date === todayIso();
-    const i = trainSessions().indexOf(s);
+    const i = trainPages().findIndex((p) => p.date === d.date);
     const main = (s.blocks || []).slice(0, 3)
       .map((b) => `${esc(b.name)} <b>${esc(b.sets)}</b>`).join(' · ');
     return `<section class="train-card" data-act="tgo" data-i="${i}">
@@ -710,22 +710,40 @@
     </section>`;
   }
 
-  // 训练页：和「今天」一样按日期左右滑，一节课一屏。
-  function trainIdx() {
+  // 训练页：和「今天」一样按日期左右滑，一天一屏，没练的那天就是休息日。
+  function trainPages() {
     const sess = trainSessions();
-    if (!sess.length) return 0;
-    if (state.tsess == null) {
-      const t = todayIso();
-      let i = sess.findIndex((s) => s.date === t);
-      if (i < 0) i = sess.findIndex((s) => s.date >= t);
-      state.tsess = i < 0 ? sess.length - 1 : i;
+    if (!sess.length) return [];
+    const w = state.week;
+    const byDate = {};
+    for (const s of sess) byDate[s.date] = s;
+    const start = w.start || sess[0].date;
+    let end = w.end || sess[sess.length - 1].date;
+    for (const s of sess) if (s.date > end) end = s.date;
+    const out = [];
+    let d = start;
+    for (let n = 0; n < 31 && d <= end; n++) {
+      out.push({ date: d, s: byDate[d] || null });
+      d = shiftIso(d, 1);
     }
-    return Math.max(0, Math.min(sess.length - 1, state.tsess));
+    return out;
   }
 
-  function tHeader(sess, i) {
-    const s = sess[i];
-    const isToday = s.date === todayIso();
+  function trainIdx() {
+    const pages = trainPages();
+    if (!pages.length) return 0;
+    if (state.tsess == null) {
+      const t = todayIso();
+      let i = pages.findIndex((p) => p.date === t);
+      if (i < 0) i = pages.findIndex((p) => p.date >= t);
+      state.tsess = i < 0 ? pages.length - 1 : i;
+    }
+    return Math.max(0, Math.min(pages.length - 1, state.tsess));
+  }
+
+  function tHeader(pages, i) {
+    const p = pages[i];
+    const isToday = p.date === todayIso();
     return `<header class="top" id="top">
       <div class="top-row">
         <div class="brand">${esc(state.week.title)} · <b>训练</b></div>
@@ -734,12 +752,23 @@
       <div class="daynav">
         <button data-act="tday" data-dir="-1" ${i === 0 ? 'disabled' : ''}>‹</button>
         <div class="daytitle">
-          <div class="d1">${md(s.date)}</div>
-          <div class="d2">${esc(s.name)} · 第 ${i + 1} 节 / ${sess.length}${isToday ? ' · <b style="color:var(--accent)">今天</b>' : ''}</div>
+          <div class="d1">${md(p.date)}</div>
+          <div class="d2">${p.s ? esc(p.s.name) : '休息日'} · 第 ${i + 1} 天 / ${pages.length}${isToday ? ' · <b style="color:var(--accent)">今天</b>' : ''}</div>
         </div>
-        <button data-act="tday" data-dir="1" ${i === sess.length - 1 ? 'disabled' : ''}>›</button>
+        <button data-act="tday" data-dir="1" ${i === pages.length - 1 ? 'disabled' : ''}>›</button>
       </div>
     </header>`;
+  }
+
+  function tRestPage(p, i, pages) {
+    const on = p.date === todayIso();
+    const next = pages.slice(i + 1).find((x) => x.s);
+    return `<section class="page" data-i="${i}" data-date="${p.date}">
+      <div class="rest">
+        <div class="rest-big">${on ? '今天休息日' : '休息日'}</div>
+        ${next ? `<div class="rest-sub">下次训练 ${md(next.date)} · ${esc(next.s.name)}</div>` : ''}
+      </div>
+    </section>`;
   }
 
   function tPage(s, i) {
@@ -774,16 +803,16 @@
   }
 
   function renderTraining() {
-    const sess = trainSessions();
-    if (!sess.length) {
+    const pages = trainPages();
+    if (!pages.length) {
       app.innerHTML = `${pageHead('训练')}<section class="page">
         <div class="empty">这周还没排训练。</div></section>`;
       paintSync();
       return;
     }
     const i = trainIdx();
-    app.innerHTML = `${tHeader(sess, i)}<div class="pager" id="pager">
-      ${sess.map((s, k) => tPage(s, k)).join('')}
+    app.innerHTML = `${tHeader(pages, i)}<div class="pager" id="pager">
+      ${pages.map((p, k) => (p.s ? tPage(p.s, k) : tRestPage(p, k, pages))).join('')}
     </div>`;
     const p = $('#pager');
     if (p) {
@@ -1746,7 +1775,7 @@
       return;
     }
     const tm = h.match(/^t\/(\d+)$/);
-    if (tm && trainSessions()[Number(tm[1])]) {
+    if (tm && trainPages()[Number(tm[1])]) {
       state.tab = 'train';
       state.tsess = Number(tm[1]);
       render();
