@@ -697,7 +697,6 @@
 
   // 训练页：和菜谱页一样是「图 + 标题 + 信息块」的卡片，点开进详情。
   function renderTraining() {
-    const t = state.week.training || {};
     const sess = trainSessions();
     const today = todayIso();
     if (!sess.length) {
@@ -724,7 +723,6 @@
       </article>`;
     }).join('');
     app.innerHTML = `${pageHead('训练')}<section class="page">
-      <div class="tr-lead">${esc(t.note || '一周三练：下肢 / 上肢 / 全身，练完 30 分钟内吃晚餐。')}</div>
       <div class="meals">${cards}</div></section>`;
     paintSync();
   }
@@ -984,7 +982,7 @@
     const used = pantryUsed();
     const items = pantryList();
     const cats = ['肉', '蛋', '豆', '蔬菜', '菌菇', '主食', '干货', '坚果', '调味'];
-    let html = pageHead('冰箱', '只算买到的，照做自动扣') + expirySummary(used);
+    let html = pageHead('冰箱') + expirySummary(used);
     let shown = 0;
     for (const cat of cats) {
       const list = items.filter((p) => p.cat === cat)
