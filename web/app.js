@@ -574,7 +574,11 @@
       ${days.map((d, i) => dayPage(d, i)).join('')}
     </div>`;
     const p = $('#pager');
-    if (p) p.scrollLeft = state.day * p.clientWidth;
+    if (p) {
+      const go = () => { p.scrollLeft = state.day * p.clientWidth; };
+      go();
+      requestAnimationFrame(go);
+    }
     initPager();
     paintSync();
   }
@@ -582,7 +586,7 @@
   function scrollToDay(n) {
     const p = $('#pager');
     if (!p) return;
-    n = Math.max(0, Math.min(state.week.days.length - 1, n));
+    n = Math.max(0, Math.min(p.children.length - 1, n));
     p.scrollTo({ left: n * p.clientWidth, behavior: 'smooth' });
   }
 
@@ -596,6 +600,16 @@
       t = setTimeout(() => {
         const w = p.clientWidth || 1;
         const i = Math.round(p.scrollLeft / w);
+        if (state.tab === 'train') {
+          const sess = trainSessions();
+          if (i !== state.tsess && i >= 0 && i < sess.length) {
+            state.tsess = i;
+            const top = $('#top');
+            if (top) top.outerHTML = tHeader(sess, i);
+            paintSync();
+          }
+          return;
+        }
         if (i !== state.day && i >= 0 && i < state.week.days.length) {
           state.day = i;
           const top = $('#top');
@@ -685,9 +699,10 @@
     const s = sessionOn(d.date);
     if (!s) return '';
     const today = d.date === todayIso();
+    const i = trainSessions().indexOf(s);
     const main = (s.blocks || []).slice(0, 3)
       .map((b) => `${esc(b.name)} <b>${esc(b.sets)}</b>`).join(' · ');
-    return `<section class="train-card" data-act="tab" data-tab="train">
+    return `<section class="train-card" data-act="tgo" data-i="${i}">
       <div class="tc-h"><h4>${today ? '今天练' : '这天练'} · ${esc(s.name)}</h4>
         <span class="tc-l">${s.minutes || 40} 分钟${s.load ? ' · ' + esc(s.load) : ''}</span></div>
       <div class="tc-b">${main}</div>
@@ -695,39 +710,92 @@
     </section>`;
   }
 
-  // 训练页：和菜谱页一样是「图 + 标题 + 信息块」的卡片，点开进详情。
+  // 训练页：和「今天」一样按日期左右滑，一节课一屏。
+  function trainIdx() {
+    const sess = trainSessions();
+    if (!sess.length) return 0;
+    if (state.tsess == null) {
+      const t = todayIso();
+      let i = sess.findIndex((s) => s.date === t);
+      if (i < 0) i = sess.findIndex((s) => s.date >= t);
+      state.tsess = i < 0 ? sess.length - 1 : i;
+    }
+    return Math.max(0, Math.min(sess.length - 1, state.tsess));
+  }
+
+  function tHeader(sess, i) {
+    const s = sess[i];
+    const isToday = s.date === todayIso();
+    return `<header class="top" id="top">
+      <div class="top-row">
+        <div class="brand">${esc(state.week.title)} · <b>训练</b></div>
+        <button class="sync" data-act="sync"><i class="dot"></i><span>同步</span></button>
+      </div>
+      <div class="daynav">
+        <button data-act="tday" data-dir="-1" ${i === 0 ? 'disabled' : ''}>‹</button>
+        <div class="daytitle">
+          <div class="d1">${md(s.date)}</div>
+          <div class="d2">${esc(s.name)} · 第 ${i + 1} 节 / ${sess.length}${isToday ? ' · <b style="color:var(--accent)">今天</b>' : ''}</div>
+        </div>
+        <button data-act="tday" data-dir="1" ${i === sess.length - 1 ? 'disabled' : ''}>›</button>
+      </div>
+    </header>`;
+  }
+
+  function tPage(s, i) {
+    const on = s.date === todayIso();
+    const warm = (s.warmup || []).map((x) => `<li>${stepText(x)}</li>`).join('');
+    const blocks = (s.blocks || []).map((b, j) => `
+      <div class="tr-row">
+        <div class="tr-i">${j + 1}</div>
+        <div class="tr-n">${esc(b.name)}${b.note ? `<small>${esc(b.note)}</small>` : ''}
+          ${b.rest ? `<i>组间歇 ${esc(b.rest)}</i>` : ''}</div>
+        <div class="tr-v"><b>${esc(b.sets)}</b>${b.load ? `<em>${esc(b.load)}</em>` : ''}</div>
+      </div>`).join('');
+    const cool = (s.cooldown || []).map((x) => `<li>${stepText(x)}</li>`).join('');
+    const tips = (s.tips || []).map((x) => `<li>${esc(x)}</li>`).join('');
+    const sets = (s.blocks || []).reduce((n, b) => n + (parseInt(b.sets, 10) || 0), 0);
+    return `<section class="page" data-i="${i}" data-date="${s.date}">
+      <div class="hero t-hero">${img('train', s.img, '', s.name, '训练')}
+        <div class="ht"><div class="s">${s.minutes || 40} 分钟 · ${(s.blocks || []).length} 个动作</div>
+          <h2>${esc(s.name)}</h2></div>
+        ${on ? '<div class="t-now">今天</div>' : ''}</div>
+      <div class="macros t-macros">
+        <div class="m"><b>${s.minutes || 40}</b><small>分钟</small></div>
+        <div class="m"><b>${(s.blocks || []).length}</b><small>个动作</small></div>
+        <div class="m"><b>${sets}</b><small>组</small></div>
+      </div>
+      <div class="block"><h3>热身</h3><ul class="tr-list">${warm}</ul></div>
+      <div class="block"><h3>正式组</h3><div class="tr-table">${blocks}</div></div>
+      <div class="block"><h3>收尾</h3><ul class="tr-list">${cool}</ul></div>
+      ${tips ? `<div class="block"><h3>注意</h3><ul class="tr-list">${tips}</ul></div>` : ''}
+      ${mealAfterTrain(s.date)}
+    </section>`;
+  }
+
   function renderTraining() {
     const sess = trainSessions();
-    const today = todayIso();
     if (!sess.length) {
       app.innerHTML = `${pageHead('训练')}<section class="page">
         <div class="empty">这周还没排训练。</div></section>`;
       paintSync();
       return;
     }
-    const cards = sess.map((s, i) => {
-      const on = s.date === today;
-      const n = (s.blocks || []).length;
-      return `<article class="meal tcard${on ? ' on' : ''}" data-act="tsess" data-i="${i}">
-        <div class="meal-img">${img('train', s.img, '', s.name, '训练', true)}
-          <div class="meal-slot">${esc(md(s.date))}</div>
-          ${on ? '<div class="meal-done">今天</div>' : ''}</div>
-        <div class="meal-body">
-          <h3>${esc(s.name)}</h3>
-          <div class="meal-meta">
-            <span class="chip">用时 <b>${s.minutes || 40}</b> 分</span>
-            <span class="chip">动作 <b>${n}</b> 个</span>
-            ${s.load ? `<span class="chip">${esc(s.load)}</span>` : ''}
-          </div>
-        </div>
-      </article>`;
-    }).join('');
-    app.innerHTML = `${pageHead('训练')}<section class="page">
-      <div class="meals">${cards}</div></section>`;
+    const i = trainIdx();
+    app.innerHTML = `${tHeader(sess, i)}<div class="pager" id="pager">
+      ${sess.map((s, k) => tPage(s, k)).join('')}
+    </div>`;
+    const p = $('#pager');
+    if (p) {
+      const go = () => { p.scrollLeft = i * p.clientWidth; };
+      go();
+      requestAnimationFrame(go);
+    }
+    initPager();
     paintSync();
   }
 
-  // 当天那顿饭的菜名，挂在训练详情底部：练完直接照着做。
+  // 当天那顿饭的菜名，挂在训练页底部：练完直接照着做。
   function mealAfterTrain(iso) {
     const d = state.week.days.find((x) => x.date === iso);
     if (!d || !d.meals || !d.meals.length) return '';
@@ -735,41 +803,6 @@
     return `<div class="tr-eat" data-act="meal" data-di="${state.week.days.indexOf(d)}" data-mi="${d.meals.length - 1}">
       <span>练完吃</span><b>${esc(m.name)}</b>
       <em>${Math.round(m.macros.kcal)} kcal · 蛋白 ${m.macros.protein} g</em></div>`;
-  }
-
-  function openTrainSheet(i, fromHistory) {
-    if (!fromHistory) history.pushState({ mw: 'train', i }, '', `#t/${i}`);
-    state.tsheet = i;
-    renderTrainSheet();
-    sheetEl.hidden = false;
-    document.body.style.overflow = 'hidden';
-    sheetEl.scrollTop = 0;
-  }
-
-  function renderTrainSheet() {
-    const s = trainSessions()[state.tsheet];
-    if (!s) return;
-    const head = `<div class="hero">${img('train', s.img, '', s.name, '训练')}
-      <button class="close" data-act="close">×</button>
-      <div class="ht"><div class="s">训练 · ${esc(md(s.date))} · ${s.minutes || 40} 分钟</div>
-        <h2>${esc(s.name)}</h2></div></div>`;
-    const warm = (s.warmup || []).map((x) => `<li>${stepText(x)}</li>`).join('');
-    const blocks = (s.blocks || []).map((b, i) => `
-      <div class="tr-row">
-        <div class="tr-i">${i + 1}</div>
-        <div class="tr-n">${esc(b.name)}${b.note ? `<small>${esc(b.note)}</small>` : ''}
-          ${b.rest ? `<i>组间歇 ${esc(b.rest)}</i>` : ''}</div>
-        <div class="tr-v"><b>${esc(b.sets)}</b>${b.load ? `<em>${esc(b.load)}</em>` : ''}</div>
-      </div>`).join('');
-    const cool = (s.cooldown || []).map((x) => `<li>${stepText(x)}</li>`).join('');
-    const tips = (s.tips || []).map((x) => `<li>${esc(x)}</li>`).join('');
-    sheetEl.innerHTML = `${head}<div class="sheet-body">
-      <div class="block"><h3>热身</h3><ul class="tr-list">${warm}</ul></div>
-      <div class="block"><h3>正式组</h3><div class="tr-table">${blocks}</div></div>
-      <div class="block"><h3>收尾</h3><ul class="tr-list">${cool}</ul></div>
-      ${tips ? `<div class="block"><h3>注意</h3><ul class="tr-list">${tips}</ul></div>` : ''}
-      ${mealAfterTrain(s.date)}
-    </div>`;
   }
 
   /* ---------------- shopping ---------------- */
@@ -1200,7 +1233,6 @@
   function hideSheet() {
     state.sheet = null;
     state.pantryOpen = null;
-    state.tsheet = null;
     sheetEl.hidden = true;
     sheetEl.innerHTML = '';
     document.body.style.overflow = '';
@@ -1442,7 +1474,8 @@
       return;
     }
     if (act === 'meal') { openMeal(Number(el.dataset.di), Number(el.dataset.mi)); return; }
-    if (act === 'tsess') { openTrainSheet(Number(el.dataset.i)); return; }
+    if (act === 'tday') { scrollToDay(trainIdx() + Number(el.dataset.dir)); return; }
+    if (act === 'tgo') { state.tsess = Number(el.dataset.i); state.tab = 'train'; render(); window.scrollTo(0, 0); return; }
     if (act === 'close') { closeSheet(); return; }
     if (act === 'jump') { state.day = Number(el.dataset.di); state.tab = 'today'; render(); window.scrollTo(0, 0); return; }
 
@@ -1715,8 +1748,8 @@
     const tm = h.match(/^t\/(\d+)$/);
     if (tm && trainSessions()[Number(tm[1])]) {
       state.tab = 'train';
+      state.tsess = Number(tm[1]);
       render();
-      openTrainSheet(Number(tm[1]), true);
       return;
     }
     if (['today', 'train', 'shop', 'fridge', 'week'].indexOf(h) >= 0) {
@@ -1749,10 +1782,10 @@
       return;
     }
     if (st && st.mw === 'train') {
-      if (state.tsheet === st.i) return;
+      if (state.tsess === st.i) return;
       state.tab = 'train';
+      state.tsess = st.i;
       render();
-      openTrainSheet(st.i, true);
       return;
     }
     if (state.sheet || state.pantryOpen) hideSheet();
