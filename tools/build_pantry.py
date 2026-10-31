@@ -180,9 +180,17 @@ def main():
             })
 
     for p in week.get("pantryBefore", []):
+        # 家里原有的存货沿用当初的入库日期，不能按本周第一天重算，
+        # 否则每排一周菜，鸡蛋、干货的保质期就被往后推一次。
+        when = week_start
+        if p.get("stockedAt"):
+            try:
+                when = date.fromisoformat(str(p["stockedAt"])[:10])
+            except ValueError:
+                when = week_start
         add(p["food"], p.get("foodId"), p.get("qty"), p.get("unit"), p.get("note"),
             state=p.get("state"), expire_at=p.get("expireAt"),
-            shelf_life=p.get("shelfLife"), when=week_start)
+            shelf_life=p.get("shelfLife"), when=when)
     for b in week.get("shopping", []):
         when = b.get("when")
         batch_date = date.fromisoformat(when[:10]) if when else week_start

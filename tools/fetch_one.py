@@ -13,11 +13,13 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from fetch_images import search, fetch_bytes, to_webp, ROOT, DISH_DIR, FOOD_DIR  # noqa: E402
 
 CREDITS = os.path.join(ROOT, "assets", "credits.json")
+TRAIN_DIR = os.path.join(ROOT, "assets", "train")
 
 
 def main():
     args = [a for a in sys.argv[1:] if not a.startswith("--")]
     food = "--food" in sys.argv
+    train = "--train" in sys.argv
     if len(args) < 2:
         print(__doc__)
         return 2
@@ -28,14 +30,15 @@ def main():
         print("NO MATCH:", query)
         return 1
     raw = fetch_bytes(hit["url"])
-    dest_dir = FOOD_DIR if food else DISH_DIR
+    dest_dir = TRAIN_DIR if train else (FOOD_DIR if food else DISH_DIR)
     os.makedirs(dest_dir, exist_ok=True)
     dest = os.path.join(dest_dir, dish_id + ".webp")
     to_webp(raw, dest, 16 / 9.0, 1280)
     credits = {}
     if os.path.exists(CREDITS):
         credits = json.load(open(CREDITS, encoding="utf-8"))
-    credits[("food/" if food else "") + dish_id] = {
+    prefix = "train/" if train else ("food/" if food else "")
+    credits[prefix + dish_id] = {
         "source": "commons", "title": hit["title"],
         "url": hit["url"], "page": hit["page"]}
     json.dump(credits, open(CREDITS, "w", encoding="utf-8"), ensure_ascii=False, indent=2)

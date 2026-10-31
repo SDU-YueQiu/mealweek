@@ -82,8 +82,8 @@ def load_week(wid=None):
 
 
 def asset_manifest():
-    man = {"dish": {}, "food": {}}
-    for kind in ("dish", "food"):
+    man = {"dish": {}, "food": {}, "train": {}}
+    for kind in ("dish", "food", "train"):
         folder = os.path.join(ASSETS, kind)
         if not os.path.isdir(folder):
             continue
@@ -174,15 +174,19 @@ def used_asset_ids(week):
     for p in week.get("pantry") or []:
         if p.get("foodId"):
             food.add(p["foodId"])
-    return {"dish": dish, "food": food}
+    train = set()
+    for s in ((week.get("training") or {}).get("sessions") or []):
+        if s.get("img"):
+            train.add(s["img"])
+    return {"dish": dish, "food": food, "train": train}
 
 
 def offline_assets(week, man):
     """Filter the manifest to this week, skipping text/composite placeholders."""
     used = used_asset_ids(week)
     placeholder = placeholder_ids(man)
-    out = {"dish": {}, "food": {}}
-    for kind in ("dish", "food"):
+    out = {"dish": {}, "food": {}, "train": {}}
+    for kind in ("dish", "food", "train"):
         skip = set(placeholder.get(kind) or [])
         for fid in sorted(used[kind]):
             h = (man.get(kind) or {}).get(fid)

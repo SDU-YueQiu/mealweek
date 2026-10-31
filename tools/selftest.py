@@ -76,7 +76,10 @@ def main():
         if s.get("date") in dates:
             check(True, "训练 %s 那天有菜单" % s.get("date"))
         else:
-            check(True, "训练 %s 不在本周菜单里（%s）" % (s.get("date"), s.get("name")), soft=True)
+            warn.append("训练 %s（%s）那天还没有菜单" % (s.get("date"), s.get("name")))
+        if s.get("img"):
+            check(os.path.exists(os.path.join(ASSETS, "train", s["img"] + ".webp")),
+                  "训练图 train/%s.webp 在" % s["img"])
 
     for p in week.get("pantry") or []:
         check(bool(p.get("foodId")), "库存 %s 有 foodId" % p.get("food"))
