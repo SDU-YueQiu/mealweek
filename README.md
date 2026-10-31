@@ -44,16 +44,17 @@ python server.py 8765
 
 **对话方式**
 
-1. **一餐一餐问**：先问「周五早餐 A / B / C」，等回答后再问午餐、再晚餐。不要一次抛 9 道题——选项之间会互相干扰。
-2. **每餐至少 3 个选项**，每个选项写清：菜名、热量、关键食材（多少克）。
-3. **每问一顿都要守住当天配额**：先算「这顿 + 剩下两顿」还能不能落进区间（当前 1600–1720 kcal、蛋白 95–110 g、碳水 200–222 g、脂肪 42–56 g）。空间不够就当场说，不要等选完才发现超标。
-4. **三餐都定完，再决定买菜计划**：先算缺什么、哪天上街买，再写「补货」清单。不要提前把采购写死。
+1. **一餐一餐问**：先问「周日早餐 A / B / C」，等回答后再问晚餐。不要一次抛一堆题——选项之间会互相干扰。
+2. **每餐至少 3 个选项**，每个选项写清：菜名、热量、蛋白、关键食材（多少克）。
+3. **每问一顿都要守住当天配额**：先算「这顿 + 剩下的餐」还能不能落进区间（当前 1410–1580 kcal、蛋白 96–124 g、碳水 135–170 g、脂肪 40–57 g）。空间不够就当场说，不要等选完才发现超标。
+4. **餐都定完，再决定买菜计划**：先算缺什么、哪天上街买，再写「补货」清单。不要提前把采购写死。
 5. **文件里只写最终选定的那套**：`week.json` 不出现 ①/② 选项、不写「备选」，打开就能照着做。
-6. **每周五晚提醒**：先把下周一–周三的菜排出来，周六一早才能照单买菜（App 的「今晚要做的」周五会自动出现这条）。
+6. **每周五晚提醒**：先把下周前几天的菜排出来，周六一早才能照单买菜（App 的「今晚要做的」周五会自动出现这条）。
+7. **一天两餐**（2026-11 起试行）：早餐出门前（7:00 前）、晚餐练完或到家后（19:30），中午不吃。`week.json` 里写 `"mealSlots": ["早餐","晚餐"]`，`tools/selftest.py` 按它校验餐数。
 
 **肉和菜**
 
-7. **冻肉只能整块解，不能按克切**：牛腿肉是 530 / 100 / 30 三块，猪精瘦肉 1 kg 一整块，猪里脊 500 一盒，鸡胸按片。绝不能写「取猪 110 g」这种废话。
+7. **冻肉只能整块解，不能按克切**：牛腿肉 530 g 一整块，猪精瘦肉 1 kg 一整块，鸡胸按片（约 200 g）。绝不能写「取猪 110 g」这种废话。一块解了用不完，就在解冻当天切开分装、当场冻回，并在 events 里记一条 `split`。
 8. 解冻后 3–5 天吃完（鸡肉 1–2 天），不许反复冻融：一块解了就把这块排进后面几天的菜单，别解了只用一半。
 9. 易坏菜优先：番茄 / 菠菜 / 上海青 / 卤水豆腐 3–5 天，香菇 4 天，黄瓜 5 天；到期前必须排进菜单，不能过期才吃。
 10. **冰箱只算买到的**：买菜页打勾才进库存；没买的只出现在买菜清单里。
@@ -64,7 +65,15 @@ python server.py 8765
 12. 冰箱 0 g 的菜收进底部「已吃完 N 种」折叠列，按用完的日期排。
 13. 每天可以单独设配额（`days[].target`），暴食后减量、聚餐前加量都不用动整周。
 14. 排菜前先看 `weeks/<id>/events.jsonl` 的最新反馈：谁被跳过、谁「不好吃」、洋葱坏了这种，都要反映到下一版菜单里。
-15. **每道菜都必须有真图**，不许拿品类卡凑数：新增菜先找成品图（Wikimedia Commons 或 360 图搜），裁成 1280×720 WebP 存到 `assets/dish/<dishId>.webp`，`assets/credits.json` 里标 `{"source": "web"}`。图片不进 git（`.gitignore`），换机器要重新跑 `tools/fetch_images.py` 或用 360 补。`tools/selftest.py` 会把「没图 / 用占位图」的菜直接判失败。
+15. **每道菜都必须有真图**，不许拿品类卡凑数：新增菜先找成品图（Wikimedia Commons 或 360 图搜），裁成 1280×720 WebP 存到 `assets/dish/<dishId>.webp`，`assets/credits.json` 里标 `{"source": "web"}` 或 `{"source": "commons"}`。加一道新菜最快的路子是 `python tools/fetch_one.py <dishId> "<英文搜索词>" <标题里必须有的词>`（加 `--food` 存食材图）。图片不进 git（`.gitignore`），换机器要重新抓。`tools/selftest.py` 会把「没图 / 用占位图」的菜直接判失败。
+16. **包装食品按包装上的营养成分表录**：火腿肠、方便面这类，`library/foods.json` 建条目（单位 根/包），`tools/nutrition.py` 的 `TABLE` 里按每 100 g 填蛋白/碳水/脂肪，钠高就在 `steps`/`tip` 里提醒「调料包少放、汤别喝」。
+
+**力量训练**
+
+17. 训练写在 `week.json` 的 `training.sessions[]` 里（`date / name / minutes / load / warmup / blocks[] / cooldown / tips`），App 有单独的「训练」页，今天页也会插入当天那节课的卡片。
+18. 器材只有一根 30 kg 杠铃（含杆），没有架子、没有卧推凳：深蹲要自己把杆扛上肩，卧推用地面卧推，推举 20 kg（拆一边的片）。
+19. 一周三练，周一/周三/周五晚上，练完 30 分钟内吃晚餐——那天的晚餐就是练后餐，碳水（米饭）放这一顿。
+20. 30 kg 加不上去了就先加次数（8 → 10 → 12），再放慢离心（3 秒），最后才考虑加片。别再给「再买哑铃/去健身房」这类建议。
 
 ## 手机安装（HTTPS）
 
@@ -139,7 +148,9 @@ weeks/<id>/events.jsonl  手机回传的事件（追加、按 id 去重）
 `week.json` 主要字段：
 
 - `targets`：每日配额与验收区间
+- `mealSlots`：一天几顿、叫什么叫（现在是 `["早餐","晚餐"]`；缺省按三餐算）
 - `days[].meals[]`：`dishId`、`items[]`（食材 + 克数）、`steps[]`、`tip`、`macros`
+- `training.sessions[]`：力量训练课（`date`、`name`、`minutes`、`load`、`warmup[]`、`blocks[]`、`cooldown[]`、`tips[]`），App「训练」页直接渲染
 - `events[]`：解冻 / 分装 / 开封的时间线
 - `shopping[]`：采购批次
 - `pantry[]`：初始库存，用于“赛博冰箱”扣减；每项带 `state`（冷冻 / 冷藏 / 常温）、`expireAt`（最晚吃完）、`shelfLife`、`shelfLifeDays`，由 `tools/build_pantry.py` 按采购日期 + 保质期/库存日期生成。`parts[]` 记录这笔库存从哪来（`before` 家里原有，或某个采购批次），手机端只把已打勾的批次算进库存
@@ -154,10 +165,15 @@ weeks/<id>/events.jsonl  手机回传的事件（追加、按 id 去重）
 
 ```bash
 python tools/selftest.py        # 数据 + 接口 + 离线包自检
+python tools/nutrition.py "挂面:90,鸡蛋:3个,食用油:6"   # 算这组食材的热量和碳蛋脂
+python tools/nutrition.py --check weeks/2026-W45/week.json   # 重算全周，和文件里的数字对一遍
+python tools/stock.py 2026-W45   # 按 events.jsonl 回放，打印「冰箱」页现在显示什么
+python weeks/<id>/build.py      # 生成本周 week.json（改菜量后重跑，热量自动重算；跟周数据一样不进 git）
 python tools/build_offline.py   # 生成 dist/mealweek-<id>.html（不用起服务）
 python tools/diagnose.py        # 事件 → 诊断卡与处方
 python tools/build_pantry.py    # 由库存和采购生成 pantry + 保质期
 python tools/build_week.py      # 给 week.json 补稳定 ID
+python tools/fetch_one.py       # 补一张菜图：fetch_one.py <dishId> "<搜索词>" <关键词>
 python tools/make_icons.py      # 生成 PWA 图标（Pillow）
 python tools/fetch_images.py    # 从 Wikimedia Commons 抓食材图（Pillow）
 ```

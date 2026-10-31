@@ -52,11 +52,13 @@ SHELF_DAYS = {
     "muer": 365, "fensi": 365, "huashengmi": 90,
     "jiang": 21, "xiaocong": 7, "suan": 60,
     "ganlajiao": 365, "doubanjiang": 180,
+    "huotuichang": 180, "xiangtianwang": 180, "fangbianmian": 180,
 }
 CAT_DAYS = {"肉": 180, "蛋": 30, "豆": 5, "蔬菜": 7, "菌菇": 5,
             "主食": 365, "干货": 365, "坚果": 90, "调味": 180, "其他": 30}
 STATE_OVERRIDE = {"jiang": "冷藏", "xiaocong": "冷藏", "suan": "常温",
-                  "doubanjiang": "冷藏"}
+                  "doubanjiang": "冷藏", "huotuichang": "常温",
+                  "xiangtianwang": "常温", "fangbianmian": "常温"}
 
 
 def parse_shelf_days(text):

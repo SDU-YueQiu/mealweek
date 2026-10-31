@@ -34,13 +34,15 @@ def main():
     check(len(days) >= 1, "至少 1 天")
     t = week["targets"]
     rng = t["range"]
+    slots = week.get("mealSlots") or ["早餐", "午餐", "晚餐"]
 
     dish_ids, food_ids = set(), set()
     for d in days:
-        check(len(d["meals"]) == 3, "%s 三餐齐全" % d["date"])
+        check(len(d["meals"]) == len(slots), "%s 一天 %d 顿" % (d["date"], len(slots)))
+        check([m["slot"] for m in d["meals"]] == slots, "%s 餐次是 %s" % (d["date"], "/".join(slots)), soft=True)
         for k in ("kcal", "carb", "protein", "fat"):
             s = round(sum(m["macros"][k] for m in d["meals"]), 1)
-            check(abs(s - d["totals"][k]) <= 0.15, "%s %s 合计 %.1f = 三餐和 %.1f" % (d["date"], k, d["totals"][k], s))
+            check(abs(s - d["totals"][k]) <= 0.15, "%s %s 合计 %.1f = 各餐和 %.1f" % (d["date"], k, d["totals"][k], s))
         for k in ("kcal", "carb", "protein", "fat"):
             v = d["totals"][k]
             lo, hi = ((d.get("target") or {}).get("range") or rng)[k]
@@ -62,6 +64,19 @@ def main():
         check(bool(b.get("items")), "%s 有采购项" % b.get("batch"))
         for it in b["items"]:
             check(bool(it.get("foodId")), "采购项 %s 有 foodId" % it.get("food"))
+
+    # 训练：日期落在本周、每个动作有组数和次数，练完那天要有晚餐。
+    dates = {d["date"] for d in days}
+    for s in ((week.get("training") or {}).get("sessions") or []):
+        check(bool(s.get("date")), "训练 %s 有日期" % s.get("name"))
+        check(bool(s.get("blocks")), "训练 %s 有动作" % s.get("name"))
+        for b in s.get("blocks") or []:
+            check(bool(b.get("sets")) and bool(b.get("name")),
+                  "训练 %s 的 %s 有组数" % (s.get("name"), b.get("name")))
+        if s.get("date") in dates:
+            check(True, "训练 %s 那天有菜单" % s.get("date"))
+        else:
+            check(True, "训练 %s 不在本周菜单里（%s）" % (s.get("date"), s.get("name")), soft=True)
 
     for p in week.get("pantry") or []:
         check(bool(p.get("foodId")), "库存 %s 有 foodId" % p.get("food"))

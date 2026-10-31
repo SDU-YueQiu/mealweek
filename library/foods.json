@@ -238,5 +238,20 @@
     "name": "辣椒粉",
     "cat": "调味",
     "unit": "g"
+  },
+  "huotuichang": {
+    "name": "火腿肠（王中王）",
+    "cat": "肉",
+    "unit": "根"
+  },
+  "xiangtianwang": {
+    "name": "火腿肠（香甜王）",
+    "cat": "肉",
+    "unit": "根"
+  },
+  "fangbianmian": {
+    "name": "方便面（白象）",
+    "cat": "主食",
+    "unit": "包"
   }
 }

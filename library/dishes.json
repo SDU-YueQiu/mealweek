@@ -240,5 +240,32 @@
       "清冰箱"
     ],
     "method": "炒"
+  },
+  "ji-dan-tang-mian": {
+    "name": "鸡蛋汤面",
+    "tags": [
+      "面",
+      "蛋",
+      "快"
+    ],
+    "method": "汤面"
+  },
+  "pao-mian-jia-dan": {
+    "name": "泡面加蛋",
+    "tags": [
+      "面",
+      "蛋",
+      "快"
+    ],
+    "method": "汤面"
+  },
+  "huo-tui-dan-bing": {
+    "name": "火腿肠蛋饼",
+    "tags": [
+      "饼",
+      "蛋",
+      "快"
+    ],
+    "method": "煎"
   }
 }

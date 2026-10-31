@@ -507,6 +507,7 @@
   function renderTabs() {
     const items = [
       ['today', '今天', '<circle cx="12" cy="12" r="8"/><path d="M12 7v5l3 2"/>'],
+      ['train', '训练', '<path d="M4 12h4M16 12h4M9 8v8M15 8v8"/>'],
       ['shop', '买菜', '<path d="M6 8h12l-1 11H7L6 8z"/><path d="M9 8a3 3 0 0 1 6 0"/>'],
       ['fridge', '冰箱', '<rect x="6" y="3" width="12" height="18" rx="2"/><path d="M6 10h12"/>'],
       ['week', '本周', '<rect x="4" y="5" width="16" height="15" rx="2"/><path d="M4 10h16M9 3v4M15 3v4"/>'],
@@ -563,7 +564,7 @@
 
     const tn = d.date === todayIso() ? tonightBlock() : '';
     return `<section class="page" data-i="${di}" data-date="${d.date}">
-      ${totals}<div class="meals">${meals}</div>${tn}${moodBlock(d)}
+      ${totals}${trainCard(d)}<div class="meals">${meals}</div>${tn}${moodBlock(d)}
     </section>`;
   }
 
@@ -615,7 +616,7 @@
         <button data-act="day" data-dir="-1" ${state.day === 0 ? 'disabled' : ''}>‹</button>
         <div class="daytitle">
           <div class="d1">${md(d.date)}</div>
-          <div class="d2">${esc(d.label)} · 第 ${state.day + 1} 天 / 7${d.date === todayIso() ? ' · <b style="color:var(--accent)">今天</b>' : ''}</div>
+          <div class="d2">${esc(d.label)} · 第 ${state.day + 1} 天 / ${state.week.days.length}${d.date === todayIso() ? ' · <b style="color:var(--accent)">今天</b>' : ''}</div>
         </div>
         <button data-act="day" data-dir="1" ${state.day === state.week.days.length - 1 ? 'disabled' : ''}>›</button>
       </div>
@@ -666,6 +667,70 @@
       ${scale('hunger', '今天饿不饿', '不饿', '很饿')}
       ${scale('energy', '今天有精神吗', '没精神', '精神')}
     </div>`;
+  }
+
+  /* ---------------- training ---------------- */
+
+  function trainSessions() {
+    const t = state.week.training;
+    return (t && t.sessions) || [];
+  }
+
+  function sessionOn(iso) {
+    return trainSessions().find((s) => s.date === iso) || null;
+  }
+
+  // A compact card on the 今天 page: what to lift that day, one line.
+  function trainCard(d) {
+    const s = sessionOn(d.date);
+    if (!s) return '';
+    const today = d.date === todayIso();
+    const main = (s.blocks || []).slice(0, 3)
+      .map((b) => `${esc(b.name)} <b>${esc(b.sets)}</b>`).join(' · ');
+    return `<section class="train-card" data-act="tab" data-tab="train">
+      <div class="tc-h"><h4>${today ? '今天练' : '这天练'} · ${esc(s.name)}</h4>
+        <span class="tc-l">${s.minutes || 40} 分钟${s.load ? ' · ' + esc(s.load) : ''}</span></div>
+      <div class="tc-b">${main}</div>
+      <div class="tc-f">点开看完整动作和重量 →</div>
+    </section>`;
+  }
+
+  function renderTraining() {
+    const t = state.week.training || {};
+    const sess = trainSessions();
+    const today = todayIso();
+    if (!sess.length) {
+      app.innerHTML = `${pageHead('训练')}<section class="page">
+        <div class="empty">这周还没排训练。</div></section>`;
+      paintSync();
+      return;
+    }
+    const cards = sess.map((s) => {
+      const on = s.date === today;
+      const warm = (s.warmup || []).map((x) => `<li>${esc(x)}</li>`).join('');
+      const blocks = (s.blocks || []).map((b) => `
+        <div class="tr-row">
+          <div class="tr-n">${esc(b.name)}${b.note ? `<small>${esc(b.note)}</small>` : ''}</div>
+          <div class="tr-v"><b>${esc(b.sets)}</b>${b.load ? `<em>${esc(b.load)}</em>` : ''}${b.rest ? `<i>歇 ${esc(b.rest)}</i>` : ''}</div>
+        </div>`).join('');
+      const cool = (s.cooldown || []).map((x) => esc(x)).join(' · ');
+      const tips = (s.tips || []).map((x) => `<li>${esc(x)}</li>`).join('');
+      return `<article class="train${on ? ' on' : ''}">
+        <header class="tr-head">
+          <div><h3>${esc(s.name)}</h3>
+            <div class="tr-sub">${esc(md(s.date))} · ${s.minutes || 40} 分钟${s.load ? ' · ' + esc(s.load) : ''}</div></div>
+          ${on ? '<span class="tr-badge">今天</span>' : ''}
+        </header>
+        <div class="tr-sec"><h5>热身</h5><ul class="tr-list">${warm}</ul></div>
+        <div class="tr-sec"><h5>正式组</h5>${blocks}</div>
+        <div class="tr-sec"><h5>收尾</h5><div class="tr-cd">${cool}</div></div>
+        ${tips ? `<div class="tr-sec"><h5>注意</h5><ul class="tr-list">${tips}</ul></div>` : ''}
+      </article>`;
+    }).join('');
+    app.innerHTML = `${pageHead('训练')}<section class="page">
+      <div class="tr-lead">${t.note ? esc(t.note) : '一周三练：下肢 / 上肢 / 全身，练完 30 分钟内吃晚餐。'}</div>
+      ${cards}</section>`;
+    paintSync();
   }
 
   /* ---------------- shopping ---------------- */
@@ -752,6 +817,7 @@
   // 调味按克进货，做菜按 片/瓣/根/个 写，换算一下才能扣库存。
   const UNIT_GRAMS = {
     jiang: { '片': 3 }, suan: { '瓣': 5 }, xiaocong: { '根': 5 }, ganlajiao: { '个': 1.5 },
+    huotuichang: { '根': 30 }, xiangtianwang: { '根': 30 }, fangbianmian: { '包': 110 },
   };
 
   function itemGrams(p, it) {
@@ -1479,6 +1545,7 @@
   function render() {
     if (!state.week) return;
     if (state.tab === 'today') renderToday();
+    else if (state.tab === 'train') renderTraining();
     else if (state.tab === 'shop') renderShopping();
     else if (state.tab === 'fridge') renderFridge();
     else renderWeek();
@@ -1603,7 +1670,7 @@
       openPantry(pm[1]);
       return;
     }
-    if (['today', 'shop', 'fridge', 'week'].indexOf(h) >= 0) {
+    if (['today', 'train', 'shop', 'fridge', 'week'].indexOf(h) >= 0) {
       state.tab = h;
       if (state.sheet) hideSheet();
       render();
@@ -1634,7 +1701,7 @@
     }
     if (state.sheet || state.pantryOpen) hideSheet();
     const h = (location.hash || '').replace(/^#\/?/, '');
-    if (['today', 'shop', 'fridge', 'week'].indexOf(h) >= 0 && h !== state.tab) {
+    if (['today', 'train', 'shop', 'fridge', 'week'].indexOf(h) >= 0 && h !== state.tab) {
       state.tab = h;
       render();
     }
