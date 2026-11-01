@@ -18,6 +18,26 @@ if (-not $py) {
 $scheme = if ($Cert -and $Key) { "https" } else { "http" }
 $url = "${scheme}://127.0.0.1:${Port}/"
 
+# HTTPS 时先确认证书覆盖当前 IP：换了网（WiFi/网线）IP 会变，证书对不上手机就报错。
+# 只重签服务器证书，CA 不变，手机不用重新装证书。
+if ($scheme -eq "https") {
+  $mk = Join-Path $PSScriptRoot "certs\make-certs.ps1"
+  if (Test-Path $mk) {
+    $ips = @(Get-NetIPAddress -AddressFamily IPv4 -ErrorAction SilentlyContinue |
+      Where-Object {
+        $_.IPAddress -notlike "127.*" -and
+        $_.IPAddress -notlike "169.254.*" -and
+        $_.IPAddress -notlike "172.19.*"
+      } | ForEach-Object { $_.IPAddress })
+    try {
+      # 单独开一个进程跑：脚本里 no-op 时会 exit，别把 start.ps1 一起带走。
+      & powershell -NoProfile -ExecutionPolicy Bypass -File $mk -Ensure -IP ($ips -join ",") | Out-Null
+    } catch {
+      Write-Host "  证书检查跳过：$($_.Exception.Message)" -ForegroundColor Yellow
+    }
+  }
+}
+
 # A hidden copy may already be serving (see start-bg.bat).  Do not die with an
 # address-in-use traceback — point the browser at the running one instead.
 $busy = $false
