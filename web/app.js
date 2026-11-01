@@ -838,6 +838,12 @@
 
   function renderShopping() {
     const w = state.week;
+    if (!(w.shopping || []).length) {
+      app.innerHTML = `${pageHead('买菜')}<section class="page">
+        <div class="empty">这周不用买菜。<br>冰箱里的肉和菜够吃这三天。</div></section>`;
+      paintSync();
+      return;
+    }
     const batches = w.shopping.map((b) => {
       const total = b.items.length;
       const done = b.items.filter((it) => state.data.shopping[b.batch + '|' + it.food]).length;
